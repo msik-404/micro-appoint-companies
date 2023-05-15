@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  micro-appoint-companies:
+    depends_on:
+      - psql
+    build: .
+    env_file:
+      - .env
+    container_name: micro-appoint-companies
+    networks:
+      - micro-appoint-net
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+
+  psql:
+    image: postgres:alpine
+    container_name: micro-appoint-companies-psql
+    networks:
+      - micro-appoint-net
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - micro-appoint-companies-psql:/var/lib/postgresql/data
+
+volumes:
+  micro-appoint-companies-psql:
+
+networks:
+  micro-appoint-net:
+    driver: bridge
