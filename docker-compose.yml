@@ -3,35 +3,37 @@ version: '3.9'
 services:
   micro-appoint-companies:
     depends_on:
-      - psql
+      - mongodb
     build: .
     env_file:
       - .env
-    container_name: micro-appoint-companies
+    image: micro-appoint-companies
+    container_name: backend
     networks:
-      - micro-appoint-net
+      - companies-net
     ports:
       - 8080:8080
     volumes:
       - .:/app
 
-  psql:
-    image: postgres:alpine
-    container_name: micro-appoint-companies-psql
+  mongodb:
+    image: mongo
+    container_name: db
+    restart: always
     networks:
-      - micro-appoint-net
+      - companies-net
     ports:
-      - 5432:5432
+      - 27017:27017
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+      - MONGO_INITDB_ROOT_DATABASE=${DB_NAME}
     volumes:
-      - micro-appoint-companies-psql:/var/lib/postgresql/data
+      - db-data:/data/db
 
 volumes:
-  micro-appoint-companies-psql:
+  db-data:
 
 networks:
-  micro-appoint-net:
+  companies-net:
     driver: bridge
