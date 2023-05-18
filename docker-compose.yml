@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  micro-appoint-companies:
+    depends_on:
+      - mongodb
+    build: .
+    env_file:
+      - .env
+    image: micro-appoint-companies
+    container_name: backend
+    networks:
+      - companies-net
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+
+  mongodb:
+    image: mongo
+    container_name: db
+    restart: always
+    networks:
+      - companies-net
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+      - MONGO_INITDB_ROOT_DATABASE=${DB_NAME}
+    volumes:
+      - db-data:/data/db
+      - db-config:/data/configdb
+
+volumes:
+  db-data:
+    driver: local
+  db-config:
+    driver: local
+
+
+networks:
+  companies-net:
+    driver: bridge
