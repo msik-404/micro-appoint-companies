@@ -30,9 +30,14 @@ services:
       - MONGO_INITDB_ROOT_DATABASE=${DB_NAME}
     volumes:
       - db-data:/data/db
+      - db-config:/data/configdb
 
 volumes:
   db-data:
+    driver: local
+  db-config:
+    driver: local
+
 
 networks:
   companies-net:
