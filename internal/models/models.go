@@ -12,7 +12,16 @@ type Service struct {
 	CompanyID   primitive.ObjectID `json:"company_id" bson:"company_id"`
 }
 
+type Description struct {
+    CompanyID   primitive.ObjectID `json:"company_id" bson:"_id"`
+    Description      string `json:"description" bson:"description"`
+}
+
 type Company struct {
-	Name        string `json:"name" bson:"name"`
-	Description string `json:"description" bson:"description"`
+    // should be unique and indexed
+	Name             string `json:"name" bson:"name"`
+    // should be indexed and from some pool of options
+	Type             string `json:"type" bson:"type"`
+	Localisation     string `json:"localisation" bson:"localisation"`
+	ShortDescription string `json:"short_description" bson:"short_description"`
 }

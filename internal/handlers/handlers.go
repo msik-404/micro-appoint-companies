@@ -14,6 +14,7 @@ import (
 
 func GetCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
+        // parse variables for pagination
 		startValue, err := pagination.GetStartValue(c)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -23,11 +24,13 @@ func GetCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
         if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         }
+        // get records based on pagination variables
 		cursor, err := pagination.FindPagin(coll, startValue, uint(nPerPage))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+        // transfom cursor into slice of companies
 		var companies []models.Company
 		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 		if err := cursor.All(ctx, &companies); err != nil {
