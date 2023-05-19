@@ -21,13 +21,14 @@ func GetCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
-		coll := db.Collection("companies")
         nPerPage, err := pagination.GetNPerPageValue(c)
         if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         }
         // get records based on pagination variables
-		cursor, err := pagination.FindPagin(coll, startValue, uint(nPerPage))
+        coll := db.Collection("companies")
+        filter := bson.D{{}}
+		cursor, err := pagination.FindPagin(coll, filter, startValue, uint(nPerPage))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -66,7 +67,34 @@ func GetCompanyEndPoint(db *mongo.Database) gin.HandlerFunc {
 
 func GetServicesEndPoint(db *mongo.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-
+        companyID, err := utils.GetObjectId(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+        // parse variables for pagination
+		startValue, err := pagination.GetStartValue(c)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+        nPerPage, err := pagination.GetNPerPageValue(c)
+        if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        }
+        coll := db.Collection("services")
+        filter := bson.D{{"company_id", companyID}}
+        cursor, err := pagination.FindPagin(coll, filter, startValue, uint(nPerPage))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+        // transfom cursor into slice of services
+		var services []models.Service
+		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		if err := cursor.All(ctx, &services); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, services)
 	}
 	return gin.HandlerFunc(fn)
 }

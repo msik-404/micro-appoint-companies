@@ -15,14 +15,17 @@ import (
 
 // findPagin returns paginated results.
 // It first finds all documents with id lower than startValue, then sorts and limits.
-func FindPagin(coll *mongo.Collection, startValue primitive.ObjectID, nPerPage uint) (*mongo.Cursor, error) {
+func FindPagin(coll *mongo.Collection, inputFilter bson.D, startValue primitive.ObjectID, nPerPage uint) (*mongo.Cursor, error) {
 	findOptions := options.Find()
 	findOptions.SetSort(bson.D{{"_id", -1}})
 	findOptions.SetLimit(int64(nPerPage))
-	filter := bson.D{{"_id", bson.D{{"$lt", startValue}}}}
+
+	paginFilter := bson.D{{"_id", bson.D{{"$lt", startValue}}}}
+	filter := bson.D{{"$and", bson.A{paginFilter, inputFilter}}}
 	if startValue.IsZero() {
-		filter = bson.D{{}}
+		filter = inputFilter
 	}
+
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	return coll.Find(ctx, filter, findOptions)
 }
