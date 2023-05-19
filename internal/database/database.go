@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-    "time"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,8 +18,8 @@ func ConnectDB() (*mongo.Client, error) {
 	// Use the SetServerAPIOptions() method to set the Stable API version to 1
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(getURI()).SetServerAPIOptions(serverAPI)
-    ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-    defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 	// Create a new client and connect to the server
 	return mongo.Connect(ctx, opts)
 }
