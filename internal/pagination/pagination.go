@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/msik-404/micro-appoint-companies/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,15 +29,7 @@ func FindPagin(coll *mongo.Collection, startValue primitive.ObjectID, nPerPage u
 
 func GetStartValue(c *gin.Context) (primitive.ObjectID, error) {
 	query := c.DefaultQuery("startValue", "")
-	startValue := primitive.NilObjectID
-	if query != "" {
-		providedStartValue, err := primitive.ObjectIDFromHex(query)
-		if err != nil {
-			return startValue, err
-		}
-		startValue = providedStartValue
-	}
-	return startValue, nil
+	return utils.GetObjectId(query)
 }
 
 type NPerPageParseErorr struct{}

@@ -24,6 +24,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/companies", handlers.GetCompaniesEndPoint(db))
+    r.GET("/companies/:id", handlers.GetCompanyEndPoint(db))
 	// r.GET("/services", handlers.GetServicesEndPoint(db))
 
 	r.Run() // listen and serve on 0.0.0.0:8080
@@ -76,4 +77,3 @@ func testInsert(db *mongo.Database) {
         }
     }
 }
-

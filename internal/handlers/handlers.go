@@ -6,10 +6,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/msik-404/micro-appoint-companies/internal/models"
 	"github.com/msik-404/micro-appoint-companies/internal/pagination"
+	"github.com/msik-404/micro-appoint-companies/internal/utils"
 )
 
 func GetCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
@@ -31,7 +33,7 @@ func GetCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 			return
 		}
         // transfom cursor into slice of companies
-		var companies []models.Company
+		var companies []bson.M
 		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 		if err := cursor.All(ctx, &companies); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -40,6 +42,26 @@ func GetCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 		c.JSON(http.StatusOK, companies)
 	}
 	return gin.HandlerFunc(fn)
+}
+
+func GetCompanyEndPoint(db *mongo.Database) gin.HandlerFunc {
+    fn := func(c *gin.Context) {
+        companyID, err := utils.GetObjectId(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+        coll := db.Collection("descriptions")
+        filter := bson.D{{"_id", companyID}}
+	    ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+        var descDoc models.Description
+        err = coll.FindOne(ctx, filter).Decode(&descDoc)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+        c.JSON(http.StatusOK, descDoc)
+    }
+    return gin.HandlerFunc(fn)
 }
 
 func GetServicesEndPoint(db *mongo.Database) gin.HandlerFunc {
