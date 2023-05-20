@@ -122,7 +122,6 @@ func PostCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, result)
-
 	}
 	return gin.HandlerFunc(fn)
 }

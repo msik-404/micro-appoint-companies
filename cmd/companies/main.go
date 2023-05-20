@@ -19,7 +19,11 @@ func main() {
 		panic(err)
 	}
 	db := mongoClient.Database("micro-appoint-companies")
-	// testInsert(db)
+    _, err = database.CreateDBIndexes(db)
+    if err != nil {
+        panic(err)
+    }
+	testInsert(db)
 
 	r := gin.Default()
 
