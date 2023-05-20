@@ -108,15 +108,12 @@ func GetServicesEndPoint(db *mongo.Database) gin.HandlerFunc {
 
 func PostCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		var newCompany models.Company
+		var newCompany models.CompanyPost
 		if err := c.BindJSON(&newCompany); err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		coll := db.Collection("companies")
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		result, err := coll.InsertOne(ctx, newCompany)
+		result, err := newCompany.Insert(db)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
