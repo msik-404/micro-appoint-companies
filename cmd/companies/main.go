@@ -24,6 +24,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/companies", handlers.GetCompaniesEndPoint(db))
+    r.POST("/companies", handlers.PostCompaniesEndPoint(db))
 	r.GET("/companies/:id", handlers.GetCompanyEndPoint(db))
 	r.GET("/services/:id", handlers.GetServicesEndPoint(db))
 

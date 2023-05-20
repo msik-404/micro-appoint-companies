@@ -105,3 +105,22 @@ func GetServicesEndPoint(db *mongo.Database) gin.HandlerFunc {
 	}
 	return gin.HandlerFunc(fn)
 }
+
+func PostCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
+    fn := func(c *gin.Context) {
+        var newCompany models.Company
+        if err := c.BindJSON(&newCompany); err != nil {
+            c.AbortWithError(http.StatusBadRequest, err)
+            return
+        }
+		coll := db.Collection("companies")
+		result, err := coll.InsertOne(context.TODO(), newCompany)
+		if err != nil {
+            c.AbortWithError(http.StatusInternalServerError, err)
+            return
+		}
+        c.JSON(http.StatusOK, result)
+
+    }
+    return gin.HandlerFunc(fn)
+}
