@@ -23,14 +23,16 @@ func main() {
     if err != nil {
         panic(err)
     }
-	testInsert(db)
+	// testInsert(db)
 
 	r := gin.Default()
 
 	r.GET("/companies", handlers.GetCompaniesEndPoint(db))
-    r.POST("/companies", handlers.PostCompaniesEndPoint(db))
 	r.GET("/companies/:id", handlers.GetCompanyEndPoint(db))
 	r.GET("/services/:id", handlers.GetServicesEndPoint(db))
+
+    r.POST("/companies", handlers.PostCompanyEndPoint(db))
+	r.POST("/services", handlers.PostServiceEndPoint(db))
 
 	r.Run() // listen and serve on 0.0.0.0:8080
 }

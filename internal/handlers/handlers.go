@@ -91,7 +91,7 @@ func GetServicesEndPoint(db *mongo.Database) gin.HandlerFunc {
 	return gin.HandlerFunc(fn)
 }
 
-func PostCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
+func PostCompanyEndPoint(db *mongo.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		var newCompany models.CompanyCombRepr
 		if err := c.BindJSON(&newCompany); err != nil {
@@ -99,6 +99,23 @@ func PostCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 			return
 		}
 		result, err := newCompany.InsertCombRepr(db)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	}
+	return gin.HandlerFunc(fn)
+}
+
+func PostServiceEndPoint(db *mongo.Database) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		var newService models.Service
+		if err := c.BindJSON(&newService); err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		result, err := newService.InsertOne(db)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
