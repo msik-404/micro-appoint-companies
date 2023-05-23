@@ -29,11 +29,11 @@ func CreateDBIndexes(db *mongo.Database) ([]string, error) {
 	coll := db.Collection("companies")
 	index := []mongo.IndexModel{
 		{
-			Keys:    bson.D{{"name", 1}},
+            Keys:    bson.M{"name": 1},
 			Options: options.Index().SetUnique(true),
 		},
 		{
-			Keys: bson.D{{"type", 1}},
+            Keys: bson.M{"type": 1},
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

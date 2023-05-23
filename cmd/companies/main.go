@@ -19,20 +19,27 @@ func main() {
 		panic(err)
 	}
 	db := mongoClient.Database("micro-appoint-companies")
-    _, err = database.CreateDBIndexes(db)
-    if err != nil {
-        panic(err)
-    }
+	_, err = database.CreateDBIndexes(db)
+	if err != nil {
+		panic(err)
+	}
 	// testInsert(db)
 
 	r := gin.Default()
 
 	r.GET("/companies", handlers.GetCompaniesEndPoint(db))
-	r.GET("/companies/:id", handlers.GetCompanyEndPoint(db))
-	r.GET("/services/:id", handlers.GetServicesEndPoint(db))
 
-    r.POST("/companies", handlers.PostCompanyEndPoint(db))
-	r.POST("/services", handlers.PostServiceEndPoint(db))
+	r.GET("/companies/:id", handlers.GetCompanyEndPoint(db))
+	r.GET("/companies/services/:id", handlers.GetServicesEndPoint(db))
+
+	r.POST("/companies", handlers.AddCompanyEndPoint(db))
+	r.POST("/services", handlers.AddServiceEndPoint(db))
+
+	r.PUT("/companies/:id", handlers.UpdateCompanyEndPoint(db))
+	r.PUT("/services/:id", handlers.UpdateServiceEndPoint(db))
+
+	r.DELETE("/companies/:id", handlers.DeleteCompanyEndPoint(db))
+	r.DELETE("/services/:id", handlers.DeleteServiceEndPoint(db))
 
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
@@ -56,9 +63,10 @@ func testInsert(db *mongo.Database) {
 		if err != nil {
 			panic(err)
 		}
+		companyID := result.InsertedID.(primitive.ObjectID)
 		description := "description: " + strconv.Itoa(i)
 		docDesc := models.Description{
-			CompanyID:   result.InsertedID.(primitive.ObjectID),
+			CompanyID:   companyID,
 			Description: description,
 		}
 		result, err = collDesc.InsertOne(context.TODO(), docDesc)
@@ -74,7 +82,7 @@ func testInsert(db *mongo.Database) {
 				Price:       price,
 				Duration:    60,
 				Description: description,
-				CompanyID:   result.InsertedID.(primitive.ObjectID),
+				CompanyID:   companyID,
 			}
 
 			result, err = collService.InsertOne(context.TODO(), docService)
