@@ -9,7 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/msik-404/micro-appoint-companies/internal/database"
-	"github.com/msik-404/micro-appoint-companies/internal/handlers"
+	"github.com/msik-404/micro-appoint-companies/internal/middleware/companies"
+	"github.com/msik-404/micro-appoint-companies/internal/middleware/services"
 	"github.com/msik-404/micro-appoint-companies/internal/models"
 )
 
@@ -27,19 +28,19 @@ func main() {
 
 	r := gin.Default()
 
-	r.GET("/companies", handlers.GetCompaniesEndPoint(db))
+	r.GET("/companies", companies.GetCompaniesEndPoint(db))
 
-	r.GET("/companies/:id", handlers.GetCompanyEndPoint(db))
-	r.GET("/companies/services/:id", handlers.GetServicesEndPoint(db))
+	r.GET("/companies/:id", companies.GetCompanyEndPoint(db))
+	r.GET("/companies/services/:id", services.GetServicesEndPoint(db))
 
-	r.POST("/companies", handlers.AddCompanyEndPoint(db))
-	r.POST("/services", handlers.AddServiceEndPoint(db))
+	r.POST("/companies", companies.AddCompanyEndPoint(db))
+	r.POST("/services", services.AddServiceEndPoint(db))
 
-	r.PUT("/companies/:id", handlers.UpdateCompanyEndPoint(db))
-	r.PUT("/services/:id", handlers.UpdateServiceEndPoint(db))
+	r.PUT("/companies/:id", companies.UpdateCompanyEndPoint(db))
+	r.PUT("/services/:id", services.UpdateServiceEndPoint(db))
 
-	r.DELETE("/companies/:id", handlers.DeleteCompanyEndPoint(db))
-	r.DELETE("/services/:id", handlers.DeleteServiceEndPoint(db))
+	r.DELETE("/companies/:id", companies.DeleteCompanyEndPoint(db))
+	r.DELETE("/services/:id", services.DeleteServiceEndPoint(db))
 
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
