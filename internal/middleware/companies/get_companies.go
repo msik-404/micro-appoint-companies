@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 
-
 	"github.com/msik-404/micro-appoint-companies/internal/middleware"
 	"github.com/msik-404/micro-appoint-companies/internal/models"
 )
@@ -22,4 +21,3 @@ func GetCompaniesEndPoint(db *mongo.Database) gin.HandlerFunc {
 	}
 	return gin.HandlerFunc(fn)
 }
-
