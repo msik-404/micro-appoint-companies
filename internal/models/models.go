@@ -13,8 +13,8 @@ type MongoModel interface {
 type Service struct {
 	ID          primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	Name        string             `json:"name" bson:"name,omitempty"`
-	Price       uint               `json:"price" bson:"price,omitempty"`
-	Duration    uint               `json:"duration" bson:"duration,omitempty"`
+	Price       int                `json:"price" bson:"price,omitempty"`
+	Duration    int                `json:"duration" bson:"duration,omitempty"`
 	Description string             `json:"description" bson:"description,omitempty"`
 	CompanyID   primitive.ObjectID `json:"company_id" bson:"company_id,omitempty"`
 }

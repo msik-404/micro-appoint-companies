@@ -76,7 +76,7 @@ func testInsert(db *mongo.Database) {
 		}
 		for j := 0; j < 15; j++ {
 			name := "name: " + strconv.Itoa(j)
-			price := uint(i * j)
+			price := int(i * j)
 			description := "description: " + strconv.Itoa(j)
 			docService := models.Service{
 				Name:        name,
