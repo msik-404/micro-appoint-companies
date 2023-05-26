@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     image: micro-appoint-companies
-    container_name: backend
+    container_name: companies-backend
     networks:
       - companies-net
     ports:
@@ -18,7 +18,7 @@ services:
 
   mongodb:
     image: mongo
-    container_name: db
+    container_name: companies-db
     restart: always
     networks:
       - companies-net
