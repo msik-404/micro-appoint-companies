@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -45,8 +44,6 @@ func GenericUpdateOne[T MongoModel](coll *mongo.Collection, filter bson.D, item 
 	if len(*replacement) == 0 {
 		return nil, nil
 	}
-    fmt.Printf("%+v", filter)
-    fmt.Printf("%+v", *replacement)
 	return coll.UpdateOne(ctx, filter, bson.M{"$set": *replacement})
 }
 
