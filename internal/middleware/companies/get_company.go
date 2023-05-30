@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/msik-404/micro-appoint-companies/internal/middleware"
@@ -18,9 +17,17 @@ func GetCompanyEndPoint(db *mongo.Database) gin.HandlerFunc {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		coll := db.Collection("descriptions")
-		filter := bson.D{{"_id", companyID}}
-		descDoc, err := models.GenericFindOne[models.Description](coll, filter)
+
+		type Company struct {
+            Name            string           `json:"name" bson:"name"`
+            Type            string           `json:"type" bson:"type"`
+            Localisation    string           `json:"localisation" bson:"localisation"`
+            LongDescription string           `json:"long_description" bson:"long_description"`
+            Services        []models.Service `json:"services" bson:"services"`
+		}
+        var company Company
+
+		err = models.FindOneCompany(db, companyID).Decode(&company)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				c.AbortWithError(http.StatusNotFound, err)
@@ -29,7 +36,7 @@ func GetCompanyEndPoint(db *mongo.Database) gin.HandlerFunc {
 			}
 			return
 		}
-		c.JSON(http.StatusOK, descDoc)
+		c.JSON(http.StatusOK, company)
 	}
 	return gin.HandlerFunc(fn)
 }

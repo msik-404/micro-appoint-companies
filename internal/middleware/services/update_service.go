@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/msik-404/micro-appoint-companies/internal/middleware"
@@ -18,18 +17,18 @@ func UpdateServiceEndPoint(db *mongo.Database) gin.HandlerFunc {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		var newService models.Service
-		if err := c.BindJSON(&newService); err != nil {
+		var serviceUpdate models.Service
+		if err := c.BindJSON(&serviceUpdate); err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		newService.ID = serviceID
-		// Update of service is not allowed to change company to which it belongs.
-		// Maybe admin should be allowed to do that.
-		newService.CompanyID = primitive.NilObjectID
-		result, err := newService.UpdateOne(db)
+		result, err := serviceUpdate.UpdateOne(db, serviceID)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			if err == mongo.ErrNoDocuments {
+				c.AbortWithError(http.StatusNotFound, err)
+			} else {
+				c.AbortWithError(http.StatusInternalServerError, err)
+			}
 			return
 		}
 		c.JSON(http.StatusOK, result)

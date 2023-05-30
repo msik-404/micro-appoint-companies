@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/msik-404/micro-appoint-companies/internal/middleware"
@@ -18,9 +17,7 @@ func DeleteServiceEndPoint(db *mongo.Database) gin.HandlerFunc {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		coll := db.Collection("services")
-		filter := bson.D{{"_id", serviceID}}
-		result, err := models.GenericDeleteOne(coll, filter)
+		result, err := models.DeleteOneService(db, serviceID)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return

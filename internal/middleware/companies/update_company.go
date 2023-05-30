@@ -17,18 +17,21 @@ func UpdateCompanyEndPoint(db *mongo.Database) gin.HandlerFunc {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		var newCompany models.CompanyCombRepr
-		if err := c.BindJSON(&newCompany); err != nil {
+		var companyUpdate models.CompanyUpdate
+		if err := c.BindJSON(&companyUpdate); err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
-		newCompany.ID = companyID
-		results, err := newCompany.UpdateCombRepr(db)
+		result, err := companyUpdate.UpdateOne(db, companyID)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			if err == mongo.ErrNoDocuments {
+				c.AbortWithError(http.StatusNotFound, err)
+			} else {
+				c.AbortWithError(http.StatusInternalServerError, err)
+			}
 			return
 		}
-		c.JSON(http.StatusOK, results)
+		c.JSON(http.StatusOK, result)
 	}
 	return gin.HandlerFunc(fn)
 }
