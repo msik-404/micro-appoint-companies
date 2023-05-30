@@ -54,9 +54,8 @@ func (companyUpdate *CompanyUpdate) UpdateOne(
 	defer cancel()
 
 	coll := db.Collection("companies")
-	filter := bson.M{"_id": companyID}
 	update := bson.M{"$set": companyUpdate}
-	return coll.UpdateOne(ctx, filter, update)
+	return coll.UpdateByID(ctx, companyID, update)
 }
 
 func DeleteOneCompany(
@@ -124,9 +123,8 @@ func (service *Service) InsertOne(
 	service.ID = primitive.NewObjectID()
 
 	coll := db.Collection("companies")
-	filter := bson.M{"_id": companyID}
 	update := bson.M{"$push": bson.M{"services": service}}
-	return coll.UpdateOne(ctx, filter, update)
+	return coll.UpdateByID(ctx, companyID, update)
 }
 
 func (serviceUpdate *Service) UpdateOne(
