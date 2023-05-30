@@ -14,10 +14,10 @@ func main() {
 		panic(err)
 	}
 	db := mongoClient.Database("micro-appoint-companies")
-	// _, err = database.CreateDBIndexes(db)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	_, err = database.CreateDBIndexes(db)
+	if err != nil {
+		panic(err)
+	}
 	r := gin.Default()
 
 	r.GET("/companies", companies.GetCompaniesEndPoint(db))
