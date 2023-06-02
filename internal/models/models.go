@@ -12,19 +12,19 @@ import (
 
 type Service struct {
 	ID          primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Name        string             `json:"name" bson:"name,omitempty"`
-	Price       int                `json:"price" bson:"price,omitempty"`
-	Duration    int                `json:"duration" bson:"duration,omitempty"`
-	Description string             `json:"description" bson:"description,omitempty"`
+	Name        string             `json:"name" bson:"name,omitempty" binding:"max=30"`
+	Price       int                `json:"price" bson:"price,omitempty" binding:"max=1000000"`
+	Duration    int                `json:"duration" bson:"duration,omitempty" binding:"max=480"`
+	Description string             `json:"description" bson:"description,omitempty" binding:"max=300"`
 }
 
 type Company struct {
 	ID               primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Name             string             `json:"name" bson:"name,omitempty"`
-	Type             string             `json:"type" bson:"type,omitempty"`
-	Localisation     string             `json:"localisation" bson:"localisation,omitempty"`
-	ShortDescription string             `json:"short_description" bson:"short_description,omitempty"`
-	LongDescription  string             `json:"long_description" bson:"long_description,omitempty"`
+	Name             string             `json:"name" bson:"name,omitempty" binding:"max=30"`
+	Type             string             `json:"type" bson:"type,omitempty" binding:"max=30"`
+	Localisation     string             `json:"localisation" bson:"localisation,omitempty" binding:"max=60"`
+	ShortDescription string             `json:"short_description" bson:"short_description,omitempty" binding:"max=150"`
+	LongDescription  string             `json:"long_description" bson:"long_description,omitempty" binding:"max=300"`
 	Services         []Service          `json:"services" bson:"services,omitempty"`
 }
 
@@ -39,11 +39,11 @@ func (company *Company) InsertOne(
 }
 
 type CompanyUpdate struct {
-	Name             string `json:"name" bson:"name,omitempty"`
-	Type             string `json:"type" bson:"type,omitempty"`
-	Localisation     string `json:"localisation" bson:"localisation,omitempty"`
-	ShortDescription string `json:"short_description" bson:"short_description,omitempty"`
-	LongDescription  string `json:"long_description" bson:"long_description,omitempty"`
+	Name             string `json:"name" bson:"name,omitempty" binding:"max=30"`
+	Type             string `json:"type" bson:"type,omitempty" binding:"max=30"`
+	Localisation     string `json:"localisation" bson:"localisation,omitempty" binding:"max=60"`
+	ShortDescription string `json:"short_description" bson:"short_description,omitempty" binding:"max=150"`
+	LongDescription  string `json:"long_description" bson:"long_description,omitempty" binding:"max=300"`
 }
 
 func (companyUpdate *CompanyUpdate) UpdateOne(
@@ -136,8 +136,8 @@ func (serviceUpdate *Service) UpdateOne(
 
 	coll := db.Collection("companies")
 	filter := bson.M{"services._id": serviceID}
-    serviceUpdate.ID = serviceID
-    update := bson.M{"$set": bson.M{"services.$": serviceUpdate}}
+	serviceUpdate.ID = serviceID
+	update := bson.M{"$set": bson.M{"services.$": serviceUpdate}}
 	return coll.UpdateOne(ctx, filter, update)
 }
 
