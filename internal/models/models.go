@@ -79,9 +79,9 @@ func FindOneCompany(
 
 	opts := options.FindOne()
 	opts.SetProjection(bson.D{
-		{"_id", 0},
-		{"short_description", 0},
-		{"services", bson.M{"$slice": 10}},
+        {Key: "_id", Value: 0},
+        {Key: "short_description", Value: 0},
+        {Key: "services", Value: bson.M{"$slice": 10}},
 	})
 
 	coll := db.Collection("companies")
@@ -101,8 +101,8 @@ func FindManyCompanies(
 	opts.SetSort(bson.M{"_id": -1})
 	opts.SetLimit(nPerPage)
 	opts.SetProjection(bson.D{
-		{"long_description", 0},
-		{"services", 0},
+        {Key: "long_description", Value: 0},
+        {Key: "services", Value: 0},
 	})
 
 	filter := bson.M{}
@@ -163,12 +163,12 @@ func FindManyServices(
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	matchStage := bson.D{{"$match", bson.M{"_id": companyID}}}
-	projectionStage := bson.D{{"$project", bson.M{"_id": 0, "services": 1}}}
-	unwindStage := bson.D{{"$unwind", "$services"}}
-	rootStage := bson.D{{"$replaceRoot", bson.M{"newRoot": "$services"}}}
-	sortStage := bson.D{{"$sort", bson.M{"_id": -1}}}
-	limitStage := bson.D{{"$limit", nPerPage}}
+    matchStage := bson.D{{Key: "$match", Value: bson.M{"_id": companyID}}}
+    projectionStage := bson.D{{Key: "$project", Value: bson.M{"_id": 0, "services": 1}}}
+    unwindStage := bson.D{{Key: "$unwind", Value: "$services"}}
+    rootStage := bson.D{{Key: "$replaceRoot", Value: bson.M{"newRoot": "$services"}}}
+    sortStage := bson.D{{Key: "$sort", Value: bson.M{"_id": -1}}}
+    limitStage := bson.D{{Key: "$limit", Value: nPerPage}}
 
 	pipeline := mongo.Pipeline{
 		matchStage,
@@ -180,7 +180,7 @@ func FindManyServices(
 	}
 	if !startValue.IsZero() {
 		startValueStage := bson.D{
-			{"$match", bson.M{"_id": bson.M{"$lt": startValue}}},
+            {Key: "$match", Value: bson.M{"_id": bson.M{"$lt": startValue}}},
 		}
 		pipeline = mongo.Pipeline{
 			matchStage,
