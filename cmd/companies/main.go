@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/msik-404/micro-appoint-companies/internal/database"
-	"github.com/msik-404/micro-appoint-companies/internal/middleware/companies"
-	"github.com/msik-404/micro-appoint-companies/internal/middleware/services"
+	"github.com/msik-404/micro-appoint-companies/internal/controllers/companies"
+	"github.com/msik-404/micro-appoint-companies/internal/controllers/services"
 )
 
 func main() {
