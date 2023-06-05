@@ -12,7 +12,7 @@ services:
     networks:
       - companies-net
     ports:
-      - 8080:8080
+      - 50051:50051
     volumes:
       - .:/app
 
@@ -37,7 +37,6 @@ volumes:
     driver: local
   db-config:
     driver: local
-
 
 networks:
   companies-net:

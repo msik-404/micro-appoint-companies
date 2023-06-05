@@ -6,6 +6,7 @@
 Dockerfile
 docker-compose.yml
 .dockerignore
+.proto
 
 *.md
 LICENSE
