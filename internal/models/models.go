@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/msik-404/micro-appoint-companies/internal/database"
@@ -13,24 +14,24 @@ import (
 
 type Service struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Name        string             `bson:"name,omitempty" binding:"max=30"`
-	Price       int32              `bson:"price,omitempty" binding:"max=1000000"`
-	Duration    int32              `bson:"duration,omitempty" binding:"max=480"`
-	Description string             `bson:"description,omitempty" binding:"max=300"`
+	Name        *string            `bson:"name,omitempty" binding:"max=30"`
+	Price       *int32             `bson:"price,omitempty" binding:"max=1000000"`
+	Duration    *int32             `bson:"duration,omitempty" binding:"max=480"`
+	Description *string            `bson:"description,omitempty" binding:"max=300"`
 }
 
 type Company struct {
 	ID               primitive.ObjectID `bson:"_id,omitempty"`
-	Name             string             `bson:"name,omitempty" binding:"max=30"`
-	Type             string             `bson:"type,omitempty" binding:"max=30"`
-	Localisation     string             `bson:"localisation,omitempty" binding:"max=60"`
-	ShortDescription string             `bson:"short_description,omitempty" binding:"max=150"`
-	LongDescription  string             `bson:"long_description,omitempty" binding:"max=300"`
+	Name             *string            `bson:"name,omitempty" binding:"max=30"`
+	Type             *string            `bson:"type,omitempty" binding:"max=30"`
+	Localisation     *string            `bson:"localisation,omitempty" binding:"max=60"`
+	ShortDescription *string            `bson:"short_description,omitempty" binding:"max=150"`
+	LongDescription  *string            `bson:"long_description,omitempty" binding:"max=300"`
 	Services         []Service          `bson:"services,omitempty"`
 }
 
 func (company *Company) InsertOne(
-    ctx context.Context,
+	ctx context.Context,
 	db *mongo.Database,
 ) (*mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -40,16 +41,8 @@ func (company *Company) InsertOne(
 	return coll.InsertOne(ctx, company)
 }
 
-type CompanyUpdate struct {
-	Name             string `bson:"name,omitempty" binding:"max=30"`
-	Type             string `bson:"type,omitempty" binding:"max=30"`
-	Localisation     string `bson:"localisation,omitempty" binding:"max=60"`
-	ShortDescription string `bson:"short_description,omitempty" binding:"max=150"`
-	LongDescription  string `bson:"long_description,omitempty" binding:"max=300"`
-}
-
-func (companyUpdate *CompanyUpdate) UpdateOne(
-    ctx context.Context,
+func (companyUpdate *Company) UpdateOne(
+	ctx context.Context,
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
@@ -62,7 +55,7 @@ func (companyUpdate *CompanyUpdate) UpdateOne(
 }
 
 func DeleteOneCompany(
-    ctx context.Context,
+	ctx context.Context,
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) (*mongo.DeleteResult, error) {
@@ -75,7 +68,7 @@ func DeleteOneCompany(
 }
 
 func FindOneCompany(
-    ctx context.Context,
+	ctx context.Context,
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) *mongo.SingleResult {
@@ -95,7 +88,7 @@ func FindOneCompany(
 }
 
 func FindManyCompanies(
-    ctx context.Context,
+	ctx context.Context,
 	db *mongo.Database,
 	startValue primitive.ObjectID,
 	nPerPage int64,
@@ -120,7 +113,7 @@ func FindManyCompanies(
 }
 
 func (service *Service) InsertOne(
-    ctx context.Context,
+	ctx context.Context,
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
@@ -134,8 +127,51 @@ func (service *Service) InsertOne(
 	return coll.UpdateByID(ctx, companyID, update)
 }
 
+func toBsonRemoveEmpty(value any) (doc *bson.M, err error) {
+	data, err := bson.Marshal(value)
+	if err != nil {
+		return
+	}
+	err = bson.Unmarshal(data, &doc)
+	return
+}
+
+func getUpdateTerms(updateMap *bson.M) bson.M {
+	updateTerms := bson.M{}
+	for key, value := range *updateMap {
+		if key != "_id" {
+			key := fmt.Sprintf("services.$.%s", key)
+			updateTerms[key] = value
+		}
+	}
+	return updateTerms
+}
+
 func (serviceUpdate *Service) UpdateOne(
-    ctx context.Context,
+	ctx context.Context,
+	db *mongo.Database,
+	serviceID primitive.ObjectID,
+) (*mongo.UpdateResult, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	serviceUpdate.ID = serviceID
+	// this function will erease nil fields,
+	// so that unwanted fields will not be set to empty
+	updateMap, err := toBsonRemoveEmpty(*serviceUpdate)
+	if err != nil {
+		return nil, err
+	}
+    updateTerms := getUpdateTerms(updateMap)
+
+    coll := db.Collection(database.CollName)
+    filter := bson.M{"services._id": serviceID}
+	update := bson.M{"$set": updateTerms}
+	return coll.UpdateOne(ctx, filter, update)
+}
+
+func DeleteOneService(
+	ctx context.Context,
 	db *mongo.Database,
 	serviceID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
@@ -144,27 +180,12 @@ func (serviceUpdate *Service) UpdateOne(
 
 	coll := db.Collection(database.CollName)
 	filter := bson.M{"services._id": serviceID}
-	serviceUpdate.ID = serviceID
-	update := bson.M{"$set": bson.M{"services.$": serviceUpdate}}
-	return coll.UpdateOne(ctx, filter, update)
-}
-
-func DeleteOneService(
-    ctx context.Context,
-	db *mongo.Database,
-	serviceID primitive.ObjectID,
-) (*mongo.UpdateResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	coll := db.Collection(database.CollName)
-    filter := bson.M{"services._id": serviceID}
 	update := bson.M{"$pull": bson.M{"services": bson.M{"_id": serviceID}}}
 	return coll.UpdateOne(ctx, filter, update)
 }
 
 func FindManyServices(
-    ctx context.Context,
+	ctx context.Context,
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 	startValue primitive.ObjectID,

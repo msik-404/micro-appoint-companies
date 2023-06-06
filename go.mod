@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	go.mongodb.org/mongo-driver v1.11.6
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 )
