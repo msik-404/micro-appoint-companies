@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net"
 
+    "google.golang.org/grpc"
+
 	"github.com/msik-404/micro-appoint-companies/internal/communication"
 	"github.com/msik-404/micro-appoint-companies/internal/database"
-	"google.golang.org/grpc"
 )
 
 func main() {
