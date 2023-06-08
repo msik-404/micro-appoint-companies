@@ -5,23 +5,24 @@ services:
     depends_on:
       - mongodb
     build: .
+    hostname: companies
     env_file:
       - .env
     image: micro-appoint-companies
     container_name: companies-backend
     networks:
-      - companies-net
+      - micro-appoint-net
     ports:
       - 50051:50051
-    volumes:
-      - .:/app
+        #volumes:
+        #  - .:/app
 
   mongodb:
     image: mongo
     container_name: companies-db
     restart: always
     networks:
-      - companies-net
+      - micro-appoint-net
     ports:
       - 27017:27017
     environment:
@@ -39,5 +40,6 @@ volumes:
     driver: local
 
 networks:
-  companies-net:
+  micro-appoint-net:
+    name: micro-appoint-net
     driver: bridge

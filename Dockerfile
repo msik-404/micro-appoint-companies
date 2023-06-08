@@ -15,12 +15,12 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -C ./cmd/companies/ -o companies
 
 # Deploy the application binary into a lean image
-# FROM alpine:latest AS build-release-stage
-# WORKDIR /
-# COPY --from=build-stage app/cmd/companies/companies /companies
+FROM alpine:latest AS build-release-stage
+WORKDIR /
+COPY --from=build-stage app/cmd/companies/companies /companies
 
 EXPOSE 50051 
 
 # Run
-# CMD ["/companies"]
-CMD ["./cmd/companies/companies"]
+CMD ["/companies"]
+# CMD ["./cmd/companies/companies"]
