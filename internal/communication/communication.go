@@ -327,8 +327,8 @@ func (s *Server) DeleteCompany(
 
 func (s *Server) FindOneCompany(
 	ctx context.Context,
-	request *OneCompanyRequest,
-) (*OneCompanyReply, error) {
+	request *CompanyRequest,
+) (*CompanyReply, error) {
 	companyID, err := primitive.ObjectIDFromHex(request.Id)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -342,7 +342,7 @@ func (s *Server) FindOneCompany(
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	companyProto := &OneCompanyReply{
+	companyProto := &CompanyReply{
 		Name:            companyModel.Name,
 		Type:            companyModel.Type,
 		Localisation:    companyModel.Localisation,
@@ -365,8 +365,8 @@ func (s *Server) FindOneCompany(
 
 func (s *Server) FindManyCompanies(
 	ctx context.Context,
-	request *ManyCompaniesRequest,
-) (reply *ManyCompaniesReply, err error) {
+	request *CompaniesRequest,
+) (reply *CompaniesReply, err error) {
 	startValue := primitive.NilObjectID
 	if request.StartValue != nil {
 		startValue, err = primitive.ObjectIDFromHex(*request.StartValue)
@@ -385,7 +385,7 @@ func (s *Server) FindManyCompanies(
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	reply = &ManyCompaniesReply{}
+	reply = &CompaniesReply{}
 	for cursor.Next(ctx) {
 		var companyModel models.Company
 		if err := cursor.Decode(&companyModel); err != nil {

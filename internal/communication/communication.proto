@@ -14,8 +14,8 @@ service Api {
     rpc AddCompany (AddCompanyRequest) returns (google.protobuf.Empty) {}
     rpc UpdateCompany (UpdateCompanyRequest) returns (google.protobuf.Empty) {}
     rpc DeleteCompany (DeleteCompanyRequest) returns (google.protobuf.Empty) {}
-    rpc FindOneCompany (OneCompanyRequest) returns (OneCompanyReply) {}
-    rpc FindManyCompanies (ManyCompaniesRequest) returns (ManyCompaniesReply) {}
+    rpc FindOneCompany (CompanyRequest) returns (CompanyReply) {}
+    rpc FindManyCompanies (CompaniesRequest) returns (CompaniesReply) {}
 }
 
 message Service {
@@ -77,11 +77,11 @@ message DeleteCompanyRequest {
     string id = 1;
 }
 
-message OneCompanyRequest {
+message CompanyRequest {
     string id = 1;
 }
 
-message OneCompanyReply {
+message CompanyReply {
     optional string name = 1;
     optional string type = 2;
     optional string localisation = 3;
@@ -89,7 +89,7 @@ message OneCompanyReply {
     repeated Service services = 5;
 }
 
-message ManyCompaniesRequest {
+message CompaniesRequest {
     optional string start_value = 1;
     optional int64 n_per_page = 2;
 }
@@ -102,6 +102,6 @@ message CompanyShort {
     optional string short_description = 5;
 }
 
-message ManyCompaniesReply {
+message CompaniesReply {
     repeated CompanyShort companies = 1;
 }

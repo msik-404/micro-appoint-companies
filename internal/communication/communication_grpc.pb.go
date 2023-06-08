@@ -30,8 +30,8 @@ type ApiClient interface {
 	AddCompany(ctx context.Context, in *AddCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateCompany(ctx context.Context, in *UpdateCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCompany(ctx context.Context, in *DeleteCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	FindOneCompany(ctx context.Context, in *OneCompanyRequest, opts ...grpc.CallOption) (*OneCompanyReply, error)
-	FindManyCompanies(ctx context.Context, in *ManyCompaniesRequest, opts ...grpc.CallOption) (*ManyCompaniesReply, error)
+	FindOneCompany(ctx context.Context, in *CompanyRequest, opts ...grpc.CallOption) (*CompanyReply, error)
+	FindManyCompanies(ctx context.Context, in *CompaniesRequest, opts ...grpc.CallOption) (*CompaniesReply, error)
 }
 
 type apiClient struct {
@@ -105,8 +105,8 @@ func (c *apiClient) DeleteCompany(ctx context.Context, in *DeleteCompanyRequest,
 	return out, nil
 }
 
-func (c *apiClient) FindOneCompany(ctx context.Context, in *OneCompanyRequest, opts ...grpc.CallOption) (*OneCompanyReply, error) {
-	out := new(OneCompanyReply)
+func (c *apiClient) FindOneCompany(ctx context.Context, in *CompanyRequest, opts ...grpc.CallOption) (*CompanyReply, error) {
+	out := new(CompanyReply)
 	err := c.cc.Invoke(ctx, "/communication.Api/FindOneCompany", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -114,8 +114,8 @@ func (c *apiClient) FindOneCompany(ctx context.Context, in *OneCompanyRequest, o
 	return out, nil
 }
 
-func (c *apiClient) FindManyCompanies(ctx context.Context, in *ManyCompaniesRequest, opts ...grpc.CallOption) (*ManyCompaniesReply, error) {
-	out := new(ManyCompaniesReply)
+func (c *apiClient) FindManyCompanies(ctx context.Context, in *CompaniesRequest, opts ...grpc.CallOption) (*CompaniesReply, error) {
+	out := new(CompaniesReply)
 	err := c.cc.Invoke(ctx, "/communication.Api/FindManyCompanies", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -134,8 +134,8 @@ type ApiServer interface {
 	AddCompany(context.Context, *AddCompanyRequest) (*emptypb.Empty, error)
 	UpdateCompany(context.Context, *UpdateCompanyRequest) (*emptypb.Empty, error)
 	DeleteCompany(context.Context, *DeleteCompanyRequest) (*emptypb.Empty, error)
-	FindOneCompany(context.Context, *OneCompanyRequest) (*OneCompanyReply, error)
-	FindManyCompanies(context.Context, *ManyCompaniesRequest) (*ManyCompaniesReply, error)
+	FindOneCompany(context.Context, *CompanyRequest) (*CompanyReply, error)
+	FindManyCompanies(context.Context, *CompaniesRequest) (*CompaniesReply, error)
 	mustEmbedUnimplementedApiServer()
 }
 
@@ -164,10 +164,10 @@ func (UnimplementedApiServer) UpdateCompany(context.Context, *UpdateCompanyReque
 func (UnimplementedApiServer) DeleteCompany(context.Context, *DeleteCompanyRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCompany not implemented")
 }
-func (UnimplementedApiServer) FindOneCompany(context.Context, *OneCompanyRequest) (*OneCompanyReply, error) {
+func (UnimplementedApiServer) FindOneCompany(context.Context, *CompanyRequest) (*CompanyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindOneCompany not implemented")
 }
-func (UnimplementedApiServer) FindManyCompanies(context.Context, *ManyCompaniesRequest) (*ManyCompaniesReply, error) {
+func (UnimplementedApiServer) FindManyCompanies(context.Context, *CompaniesRequest) (*CompaniesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindManyCompanies not implemented")
 }
 func (UnimplementedApiServer) mustEmbedUnimplementedApiServer() {}
@@ -310,7 +310,7 @@ func _Api_DeleteCompany_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 func _Api_FindOneCompany_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OneCompanyRequest)
+	in := new(CompanyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -322,13 +322,13 @@ func _Api_FindOneCompany_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/communication.Api/FindOneCompany",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiServer).FindOneCompany(ctx, req.(*OneCompanyRequest))
+		return srv.(ApiServer).FindOneCompany(ctx, req.(*CompanyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Api_FindManyCompanies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ManyCompaniesRequest)
+	in := new(CompaniesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -340,7 +340,7 @@ func _Api_FindManyCompanies_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/communication.Api/FindManyCompanies",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiServer).FindManyCompanies(ctx, req.(*ManyCompaniesRequest))
+		return srv.(ApiServer).FindManyCompanies(ctx, req.(*CompaniesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
