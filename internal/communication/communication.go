@@ -25,7 +25,7 @@ func verifyString(value *string, maxLength int) (*string, error) {
 		if len(*value) > int(maxLength) {
 			return nil, status.Errorf(
 				codes.InvalidArgument,
-				"value should be shorter than %d",
+				"Value should be shorter than %d",
 				maxLength,
 			)
 		}
@@ -38,7 +38,7 @@ func verifyInteger[T constraints.Integer](value *T, low T, high T) (*T, error) {
 		if *value > high || *value <= low {
 			return nil, status.Errorf(
 				codes.InvalidArgument,
-				"value should be smaller than %d and greater than %d",
+				"Value should be smaller than %d and greater than %d",
 				high,
 				low,
 			)
