@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/msik-404/micro-appoint-companies/internal/database"
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,9 +33,6 @@ func (company *Company) InsertOne(
 	ctx context.Context,
 	db *mongo.Database,
 ) (*mongo.InsertOneResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	coll := db.Collection(database.CollName)
 	return coll.InsertOne(ctx, company)
 }
@@ -46,9 +42,6 @@ func (companyUpdate *Company) UpdateOne(
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	coll := db.Collection(database.CollName)
 	update := bson.M{"$set": companyUpdate}
 	return coll.UpdateByID(ctx, companyID, update)
@@ -59,9 +52,6 @@ func DeleteOneCompany(
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) (*mongo.DeleteResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	coll := db.Collection(database.CollName)
 	filter := bson.M{"_id": companyID}
 	return coll.DeleteOne(ctx, filter)
@@ -72,9 +62,6 @@ func FindOneCompany(
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) *mongo.SingleResult {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	opts := options.FindOne()
 	opts.SetProjection(bson.D{
 		{Key: "_id", Value: 0},
@@ -93,9 +80,6 @@ func FindManyCompanies(
 	startValue primitive.ObjectID,
 	nPerPage int64,
 ) (*mongo.Cursor, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	opts := options.Find()
 	opts.SetSort(bson.M{"_id": -1})
 	opts.SetLimit(nPerPage)
@@ -117,9 +101,6 @@ func (service *Service) InsertOne(
 	db *mongo.Database,
 	companyID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	service.ID = primitive.NewObjectID()
 
 	coll := db.Collection(database.CollName)
@@ -152,9 +133,6 @@ func (serviceUpdate *Service) UpdateOne(
 	db *mongo.Database,
 	serviceID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	serviceUpdate.ID = serviceID
 	// this function will erease nil fields,
 	// so that unwanted fields will not be set to empty
@@ -175,9 +153,6 @@ func DeleteOneService(
 	db *mongo.Database,
 	serviceID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	coll := db.Collection(database.CollName)
 	filter := bson.M{"services._id": serviceID}
 	update := bson.M{"$pull": bson.M{"services": bson.M{"_id": serviceID}}}
@@ -191,9 +166,6 @@ func FindManyServices(
 	startValue primitive.ObjectID,
 	nPerPage int64,
 ) (*mongo.Cursor, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
 	matchStage := bson.D{{Key: "$match", Value: bson.M{"_id": companyID}}}
 	projectionStage := bson.D{{Key: "$project", Value: bson.M{"_id": 0, "services": 1}}}
 	unwindStage := bson.D{{Key: "$unwind", Value: "$services"}}
