@@ -6,7 +6,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/exp/constraints"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -18,33 +17,6 @@ import (
 type Server struct {
 	UnimplementedApiServer
 	Client mongo.Client
-}
-
-func verifyString(value *string, maxLength int) (*string, error) {
-	if value != nil {
-		if len(*value) > int(maxLength) {
-			return nil, status.Errorf(
-				codes.InvalidArgument,
-				"Value should be shorter than %d",
-				maxLength,
-			)
-		}
-	}
-	return value, nil
-}
-
-func verifyInteger[T constraints.Integer](value *T, low T, high T) (*T, error) {
-	if value != nil {
-		if *value > high || *value <= low {
-			return nil, status.Errorf(
-				codes.InvalidArgument,
-				"Value should be smaller than %d and greater than %d",
-				high,
-				low,
-			)
-		}
-	}
-	return value, nil
 }
 
 func (s *Server) AddService(
