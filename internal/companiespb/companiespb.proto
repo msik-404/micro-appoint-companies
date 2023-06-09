@@ -2,9 +2,9 @@ syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/msik-404/micro-appoint-companies/internal/communication";
+option go_package = "github.com/msik-404/micro-appoint-companies/internal/companiespb";
 
-package communication;
+package companiespb;
 
 service Api {
     rpc AddService (AddServiceRequest) returns (google.protobuf.Empty) {}

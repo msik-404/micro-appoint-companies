@@ -6,7 +6,7 @@ import (
 
     "google.golang.org/grpc"
 
-	"github.com/msik-404/micro-appoint-companies/internal/communication"
+	"github.com/msik-404/micro-appoint-companies/internal/companiespb"
 	"github.com/msik-404/micro-appoint-companies/internal/database"
 )
 
@@ -25,7 +25,7 @@ func main() {
         panic(err)
     }
     s := grpc.NewServer()
-    communication.RegisterApiServer(s, &communication.Server{Client: *mongoClient})
+    companiespb.RegisterApiServer(s, &companiespb.Server{Client: *mongoClient})
     if err := s.Serve(lis); err != nil {
         panic(err)
     }

@@ -1,4 +1,4 @@
-package communication
+package companiespb 
 
 import (
 	"golang.org/x/exp/constraints"

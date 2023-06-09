@@ -1,4 +1,4 @@
-package communication
+package companiespb
 
 import (
 	"context"

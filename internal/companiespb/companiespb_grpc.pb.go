@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: communication.proto
+// source: companiespb.proto
 
-package communication
+package companiespb
 
 import (
 	context "context"
@@ -44,7 +44,7 @@ func NewApiClient(cc grpc.ClientConnInterface) ApiClient {
 
 func (c *apiClient) AddService(ctx context.Context, in *AddServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/communication.Api/AddService", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/AddService", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *apiClient) AddService(ctx context.Context, in *AddServiceRequest, opts 
 
 func (c *apiClient) UpdateService(ctx context.Context, in *UpdateServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/communication.Api/UpdateService", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/UpdateService", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *apiClient) UpdateService(ctx context.Context, in *UpdateServiceRequest,
 
 func (c *apiClient) DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/communication.Api/DeleteService", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/DeleteService", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (c *apiClient) DeleteService(ctx context.Context, in *DeleteServiceRequest,
 
 func (c *apiClient) FindManyServices(ctx context.Context, in *ServicesRequest, opts ...grpc.CallOption) (*ServicesReply, error) {
 	out := new(ServicesReply)
-	err := c.cc.Invoke(ctx, "/communication.Api/FindManyServices", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/FindManyServices", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *apiClient) FindManyServices(ctx context.Context, in *ServicesRequest, o
 
 func (c *apiClient) AddCompany(ctx context.Context, in *AddCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/communication.Api/AddCompany", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/AddCompany", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *apiClient) AddCompany(ctx context.Context, in *AddCompanyRequest, opts 
 
 func (c *apiClient) UpdateCompany(ctx context.Context, in *UpdateCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/communication.Api/UpdateCompany", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/UpdateCompany", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *apiClient) UpdateCompany(ctx context.Context, in *UpdateCompanyRequest,
 
 func (c *apiClient) DeleteCompany(ctx context.Context, in *DeleteCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/communication.Api/DeleteCompany", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/DeleteCompany", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (c *apiClient) DeleteCompany(ctx context.Context, in *DeleteCompanyRequest,
 
 func (c *apiClient) FindOneCompany(ctx context.Context, in *CompanyRequest, opts ...grpc.CallOption) (*CompanyReply, error) {
 	out := new(CompanyReply)
-	err := c.cc.Invoke(ctx, "/communication.Api/FindOneCompany", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/FindOneCompany", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *apiClient) FindOneCompany(ctx context.Context, in *CompanyRequest, opts
 
 func (c *apiClient) FindManyCompanies(ctx context.Context, in *CompaniesRequest, opts ...grpc.CallOption) (*CompaniesReply, error) {
 	out := new(CompaniesReply)
-	err := c.cc.Invoke(ctx, "/communication.Api/FindManyCompanies", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/FindManyCompanies", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func _Api_AddService_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/AddService",
+		FullMethod: "/companiespb.Api/AddService",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).AddService(ctx, req.(*AddServiceRequest))
@@ -211,7 +211,7 @@ func _Api_UpdateService_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/UpdateService",
+		FullMethod: "/companiespb.Api/UpdateService",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).UpdateService(ctx, req.(*UpdateServiceRequest))
@@ -229,7 +229,7 @@ func _Api_DeleteService_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/DeleteService",
+		FullMethod: "/companiespb.Api/DeleteService",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).DeleteService(ctx, req.(*DeleteServiceRequest))
@@ -247,7 +247,7 @@ func _Api_FindManyServices_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/FindManyServices",
+		FullMethod: "/companiespb.Api/FindManyServices",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).FindManyServices(ctx, req.(*ServicesRequest))
@@ -265,7 +265,7 @@ func _Api_AddCompany_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/AddCompany",
+		FullMethod: "/companiespb.Api/AddCompany",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).AddCompany(ctx, req.(*AddCompanyRequest))
@@ -283,7 +283,7 @@ func _Api_UpdateCompany_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/UpdateCompany",
+		FullMethod: "/companiespb.Api/UpdateCompany",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).UpdateCompany(ctx, req.(*UpdateCompanyRequest))
@@ -301,7 +301,7 @@ func _Api_DeleteCompany_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/DeleteCompany",
+		FullMethod: "/companiespb.Api/DeleteCompany",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).DeleteCompany(ctx, req.(*DeleteCompanyRequest))
@@ -319,7 +319,7 @@ func _Api_FindOneCompany_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/FindOneCompany",
+		FullMethod: "/companiespb.Api/FindOneCompany",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).FindOneCompany(ctx, req.(*CompanyRequest))
@@ -337,7 +337,7 @@ func _Api_FindManyCompanies_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Api/FindManyCompanies",
+		FullMethod: "/companiespb.Api/FindManyCompanies",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).FindManyCompanies(ctx, req.(*CompaniesRequest))
@@ -349,7 +349,7 @@ func _Api_FindManyCompanies_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Api_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "communication.Api",
+	ServiceName: "companiespb.Api",
 	HandlerType: (*ApiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -390,5 +390,5 @@ var Api_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "communication.proto",
+	Metadata: "companiespb.proto",
 }
