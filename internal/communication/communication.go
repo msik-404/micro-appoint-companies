@@ -132,8 +132,8 @@ func (s *Server) DeleteService(
 
 func (s *Server) FindManyServices(
 	ctx context.Context,
-	request *ManyServicesRequest,
-) (*ManyServicesReply, error) {
+	request *ServicesRequest,
+) (*ServicesReply, error) {
 	companyID, err := primitive.ObjectIDFromHex(request.CompanyId)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
@@ -156,7 +156,7 @@ func (s *Server) FindManyServices(
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	reply := &ManyServicesReply{}
+	reply := &ServicesReply{}
 	for cursor.Next(ctx) {
 		var serviceModel = models.Service{}
 		if err := cursor.Decode(&serviceModel); err != nil {

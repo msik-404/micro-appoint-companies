@@ -10,7 +10,7 @@ service Api {
     rpc AddService (AddServiceRequest) returns (google.protobuf.Empty) {}
     rpc UpdateService (UpdateServiceRequest) returns (google.protobuf.Empty) {}
     rpc DeleteService (DeleteServiceRequest) returns (google.protobuf.Empty) {}
-    rpc FindManyServices (ManyServicesRequest) returns (ManyServicesReply) {}
+    rpc FindManyServices (ServicesRequest) returns (ServicesReply) {}
     rpc AddCompany (AddCompanyRequest) returns (google.protobuf.Empty) {}
     rpc UpdateCompany (UpdateCompanyRequest) returns (google.protobuf.Empty) {}
     rpc DeleteCompany (DeleteCompanyRequest) returns (google.protobuf.Empty) {}
@@ -46,13 +46,13 @@ message DeleteServiceRequest {
     string id = 1;
 }
 
-message ManyServicesRequest {
+message ServicesRequest {
     string company_id = 1;
     optional string start_value = 2;
     optional int64 n_per_page = 3;
 }
 
-message ManyServicesReply{
+message ServicesReply{
     repeated Service services = 1;
 }
 

@@ -26,7 +26,7 @@ type ApiClient interface {
 	AddService(ctx context.Context, in *AddServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateService(ctx context.Context, in *UpdateServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	FindManyServices(ctx context.Context, in *ManyServicesRequest, opts ...grpc.CallOption) (*ManyServicesReply, error)
+	FindManyServices(ctx context.Context, in *ServicesRequest, opts ...grpc.CallOption) (*ServicesReply, error)
 	AddCompany(ctx context.Context, in *AddCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateCompany(ctx context.Context, in *UpdateCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCompany(ctx context.Context, in *DeleteCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -69,8 +69,8 @@ func (c *apiClient) DeleteService(ctx context.Context, in *DeleteServiceRequest,
 	return out, nil
 }
 
-func (c *apiClient) FindManyServices(ctx context.Context, in *ManyServicesRequest, opts ...grpc.CallOption) (*ManyServicesReply, error) {
-	out := new(ManyServicesReply)
+func (c *apiClient) FindManyServices(ctx context.Context, in *ServicesRequest, opts ...grpc.CallOption) (*ServicesReply, error) {
+	out := new(ServicesReply)
 	err := c.cc.Invoke(ctx, "/communication.Api/FindManyServices", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -130,7 +130,7 @@ type ApiServer interface {
 	AddService(context.Context, *AddServiceRequest) (*emptypb.Empty, error)
 	UpdateService(context.Context, *UpdateServiceRequest) (*emptypb.Empty, error)
 	DeleteService(context.Context, *DeleteServiceRequest) (*emptypb.Empty, error)
-	FindManyServices(context.Context, *ManyServicesRequest) (*ManyServicesReply, error)
+	FindManyServices(context.Context, *ServicesRequest) (*ServicesReply, error)
 	AddCompany(context.Context, *AddCompanyRequest) (*emptypb.Empty, error)
 	UpdateCompany(context.Context, *UpdateCompanyRequest) (*emptypb.Empty, error)
 	DeleteCompany(context.Context, *DeleteCompanyRequest) (*emptypb.Empty, error)
@@ -152,7 +152,7 @@ func (UnimplementedApiServer) UpdateService(context.Context, *UpdateServiceReque
 func (UnimplementedApiServer) DeleteService(context.Context, *DeleteServiceRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteService not implemented")
 }
-func (UnimplementedApiServer) FindManyServices(context.Context, *ManyServicesRequest) (*ManyServicesReply, error) {
+func (UnimplementedApiServer) FindManyServices(context.Context, *ServicesRequest) (*ServicesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindManyServices not implemented")
 }
 func (UnimplementedApiServer) AddCompany(context.Context, *AddCompanyRequest) (*emptypb.Empty, error) {
@@ -238,7 +238,7 @@ func _Api_DeleteService_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 func _Api_FindManyServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ManyServicesRequest)
+	in := new(ServicesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -250,7 +250,7 @@ func _Api_FindManyServices_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/communication.Api/FindManyServices",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiServer).FindManyServices(ctx, req.(*ManyServicesRequest))
+		return srv.(ApiServer).FindManyServices(ctx, req.(*ServicesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
