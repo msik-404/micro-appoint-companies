@@ -42,4 +42,4 @@ volumes:
 networks:
   micro-appoint-net:
     name: micro-appoint-net
-    driver: bridge
+    external: true
