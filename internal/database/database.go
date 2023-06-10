@@ -12,7 +12,7 @@ import (
 )
 
 var DBName = os.Getenv("DB_NAME")
-var CollName string = "companies"
+const CollName string = "companies"
 
 func getURI() string {
 	return fmt.Sprintf("mongodb://%s:%s@mongodb:27017", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"))
