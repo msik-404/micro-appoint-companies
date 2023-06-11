@@ -6,23 +6,23 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func verifyString(value *string, maxLength int) (*string, error) {
+func verifyString(value *string, maxLength int) error {
 	if value != nil {
 		if len(*value) > int(maxLength) {
-			return nil, status.Errorf(
+			return status.Errorf(
 				codes.InvalidArgument,
 				"Value should be shorter than %d",
 				maxLength,
 			)
 		}
 	}
-	return value, nil
+	return nil
 }
 
-func verifyInteger[T constraints.Integer](value *T, low T, high T) (*T, error) {
+func verifyInteger[T constraints.Integer](value *T, low T, high T) error {
 	if value != nil {
 		if *value > high || *value <= low {
-			return nil, status.Errorf(
+			return status.Errorf(
 				codes.InvalidArgument,
 				"Value should be smaller than %d and greater than %d",
 				high,
@@ -30,5 +30,5 @@ func verifyInteger[T constraints.Integer](value *T, low T, high T) (*T, error) {
 			)
 		}
 	}
-	return value, nil
+	return nil
 }

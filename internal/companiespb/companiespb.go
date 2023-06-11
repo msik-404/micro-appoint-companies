@@ -23,32 +23,32 @@ func (s *Server) AddService(
 	ctx context.Context,
 	request *AddServiceRequest,
 ) (*emptypb.Empty, error) {
-	companyID, err := primitive.ObjectIDFromHex(request.CompanyId)
+	companyID, err := primitive.ObjectIDFromHex(request.GetCompanyId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	name, err := verifyString(request.Name, 30)
+	err = verifyString(request.Name, 30)
 	if err != nil {
 		return nil, err
 	}
-	price, err := verifyInteger(request.Price, 0, 1000000)
+	err = verifyInteger(request.Price, 0, 1000000)
 	if err != nil {
 		return nil, err
 	}
-	duration, err := verifyInteger(request.Duration, 0, 480)
+	err = verifyInteger(request.Duration, 0, 480)
 	if err != nil {
 		return nil, err
 	}
-	description, err := verifyString(request.Description, 300)
+	err = verifyString(request.Description, 300)
 	if err != nil {
 		return nil, err
 	}
 	// check for nil
 	newSerivce := models.Service{
-		Name:        name,
-		Price:       price,
-		Duration:    duration,
-		Description: description,
+		Name:        request.GetName(),
+		Price:       request.GetPrice(),
+		Duration:    request.GetDuration(),
+		Description: request.GetDescription(),
 	}
 	db := s.Client.Database(database.DBName)
 	result, err := newSerivce.InsertOne(ctx, db, companyID)
@@ -68,31 +68,31 @@ func (s *Server) UpdateService(
 	ctx context.Context,
 	request *UpdateServiceRequest,
 ) (*emptypb.Empty, error) {
-	serviceID, err := primitive.ObjectIDFromHex(request.Id)
+	serviceID, err := primitive.ObjectIDFromHex(request.GetId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	name, err := verifyString(request.Name, 30)
+	err = verifyString(request.Name, 30)
 	if err != nil {
 		return nil, err
 	}
-	price, err := verifyInteger(request.Price, 0, 1000000)
+	err = verifyInteger(request.Price, 0, 1000000)
 	if err != nil {
 		return nil, err
 	}
-	duration, err := verifyInteger(request.Duration, 0, 480)
+	err = verifyInteger(request.Duration, 0, 480)
 	if err != nil {
 		return nil, err
 	}
-	description, err := verifyString(request.Description, 300)
+	err = verifyString(request.Description, 300)
 	if err != nil {
 		return nil, err
 	}
-	serviceUpdate := models.Service{
-		Name:        name,
-		Price:       price,
-		Duration:    duration,
-		Description: description,
+	serviceUpdate := models.ServiceUpdate{
+		Name:        request.Name,
+		Price:       request.Price,
+		Duration:    request.Duration,
+		Description: request.Description,
 	}
 	db := s.Client.Database(database.DBName)
 	result, err := serviceUpdate.UpdateOne(ctx, db, serviceID)
@@ -112,7 +112,7 @@ func (s *Server) DeleteService(
 	ctx context.Context,
 	request *DeleteServiceRequest,
 ) (*emptypb.Empty, error) {
-	serviceID, err := primitive.ObjectIDFromHex(request.Id)
+	serviceID, err := primitive.ObjectIDFromHex(request.GetId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -134,20 +134,20 @@ func (s *Server) FindManyServices(
 	ctx context.Context,
 	request *ServicesRequest,
 ) (*ServicesReply, error) {
-	companyID, err := primitive.ObjectIDFromHex(request.CompanyId)
+	companyID, err := primitive.ObjectIDFromHex(request.GetCompanyId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	startValue := primitive.NilObjectID
 	if request.StartValue != nil {
-		startValue, err = primitive.ObjectIDFromHex(*request.StartValue)
+		startValue, err = primitive.ObjectIDFromHex(request.GetStartValue())
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
-	var nPerPage int64 = 10
+	var nPerPage int64 = 30
 	if request.NPerPage != nil {
-		nPerPage = *request.NPerPage
+		nPerPage = request.GetNPerPage()
 	}
 	db := s.Client.Database(database.DBName)
 	cursor, err := models.FindManyServices(ctx, db, companyID, startValue, nPerPage)
@@ -158,16 +158,17 @@ func (s *Server) FindManyServices(
 	defer cancel()
 	reply := &ServicesReply{}
 	for cursor.Next(ctx) {
-		var serviceModel = models.Service{}
+		var serviceModel models.Service
 		if err := cursor.Decode(&serviceModel); err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+		serviceID := serviceModel.ID.Hex()
 		serviceProto := &Service{
-			Id:          serviceModel.ID.Hex(),
-			Name:        serviceModel.Name,
-			Price:       serviceModel.Price,
-			Duration:    serviceModel.Duration,
-			Description: serviceModel.Description,
+			Id:          &serviceID,
+			Name:        &serviceModel.Name,
+			Price:       &serviceModel.Price,
+			Duration:    &serviceModel.Duration,
+			Description: &serviceModel.Description,
 		}
 		reply.Services = append(reply.Services, serviceProto)
 	}
@@ -184,39 +185,38 @@ func (s *Server) AddCompany(
 	ctx context.Context,
 	request *AddCompanyRequest,
 ) (*emptypb.Empty, error) {
-	name, err := verifyString(request.Name, 30)
-	if err != nil {
-		return nil, err
-	}
-	if name == nil {
+	if request.Name == nil {
 		return nil, status.Error(
 			codes.InvalidArgument,
 			"name should be set",
 		)
-
 	}
-	companyType, err := verifyString(request.Type, 30)
+	err := verifyString(request.Name, 30)
 	if err != nil {
 		return nil, err
 	}
-	localisation, err := verifyString(request.Localisation, 60)
+	err = verifyString(request.Type, 30)
 	if err != nil {
 		return nil, err
 	}
-	shortDescription, err := verifyString(request.ShortDescription, 150)
+	err = verifyString(request.Localisation, 60)
 	if err != nil {
 		return nil, err
 	}
-	longDescription, err := verifyString(request.LongDescription, 300)
+	err = verifyString(request.ShortDescription, 150)
+	if err != nil {
+		return nil, err
+	}
+	err = verifyString(request.LongDescription, 300)
 	if err != nil {
 		return nil, err
 	}
 	newCompany := models.Company{
-		Name:             name,
-		Type:             companyType,
-		Localisation:     localisation,
-		ShortDescription: shortDescription,
-		LongDescription:  longDescription,
+		Name:             request.GetName(),
+		Type:             request.GetType(),
+		Localisation:     request.GetLocalisation(),
+		ShortDescription: request.GetShortDescription(),
+		LongDescription:  request.GetLongDescription(),
 	}
 	db := s.Client.Database(database.DBName)
 	_, err = newCompany.InsertOne(ctx, db)
@@ -230,36 +230,36 @@ func (s *Server) UpdateCompany(
 	ctx context.Context,
 	request *UpdateCompanyRequest,
 ) (*emptypb.Empty, error) {
-	companyID, err := primitive.ObjectIDFromHex(request.Id)
+	companyID, err := primitive.ObjectIDFromHex(request.GetId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	name, err := verifyString(request.Name, 30)
+	err = verifyString(request.Name, 30)
 	if err != nil {
 		return nil, err
 	}
-	companyType, err := verifyString(request.Type, 30)
+	err = verifyString(request.Type, 30)
 	if err != nil {
 		return nil, err
 	}
-	localisation, err := verifyString(request.Localisation, 60)
+	err = verifyString(request.Localisation, 60)
 	if err != nil {
 		return nil, err
 	}
-	shortDescription, err := verifyString(request.ShortDescription, 150)
+	err = verifyString(request.ShortDescription, 150)
 	if err != nil {
 		return nil, err
 	}
-	longDescription, err := verifyString(request.LongDescription, 300)
+	err = verifyString(request.LongDescription, 300)
 	if err != nil {
 		return nil, err
 	}
-	companyUpdate := models.Company{
-		Name:             name,
-		Type:             companyType,
-		Localisation:     localisation,
-		ShortDescription: shortDescription,
-		LongDescription:  longDescription,
+	companyUpdate := models.CompanyUpdate{
+		Name:             request.Name,
+		Type:             request.Type,
+		Localisation:     request.Localisation,
+		ShortDescription: request.ShortDescription,
+		LongDescription:  request.LongDescription,
 	}
 	db := s.Client.Database(database.DBName)
 	result, err := companyUpdate.UpdateOne(ctx, db, companyID)
@@ -279,7 +279,7 @@ func (s *Server) DeleteCompany(
 	ctx context.Context,
 	request *DeleteCompanyRequest,
 ) (*emptypb.Empty, error) {
-	companyID, err := primitive.ObjectIDFromHex(request.Id)
+	companyID, err := primitive.ObjectIDFromHex(request.GetId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -301,12 +301,12 @@ func (s *Server) FindOneCompany(
 	ctx context.Context,
 	request *CompanyRequest,
 ) (*CompanyReply, error) {
-	companyID, err := primitive.ObjectIDFromHex(request.Id)
+	companyID, err := primitive.ObjectIDFromHex(request.GetId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	db := s.Client.Database(database.DBName)
-	companyModel := models.Company{}
+	var companyModel models.Company
 	err = models.FindOneCompany(ctx, db, companyID).Decode(&companyModel)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -315,20 +315,19 @@ func (s *Server) FindOneCompany(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	companyProto := &CompanyReply{
-		Name:            companyModel.Name,
-		Type:            companyModel.Type,
-		Localisation:    companyModel.Localisation,
-		LongDescription: companyModel.LongDescription,
+		Name:            &companyModel.Name,
+		Type:            &companyModel.Type,
+		Localisation:    &companyModel.Localisation,
+		LongDescription: &companyModel.LongDescription,
 	}
-	for _, service := range companyModel.Services {
-		// Mandatory copy, to get proper pointers
-		service := service
+	for idx := range companyModel.Services {
+		serviceID := companyModel.Services[idx].ID.Hex()
 		serviceProto := Service{
-			Id:          service.ID.Hex(),
-			Name:        service.Name,
-			Price:       service.Price,
-			Duration:    service.Duration,
-			Description: service.Description,
+			Id:          &serviceID,
+			Name:        &companyModel.Services[idx].Name,
+			Price:       &companyModel.Services[idx].Price,
+			Duration:    &companyModel.Services[idx].Duration,
+			Description: &companyModel.Services[idx].Description,
 		}
 		companyProto.Services = append(companyProto.Services, &serviceProto)
 	}
@@ -341,12 +340,12 @@ func (s *Server) FindManyCompanies(
 ) (reply *CompaniesReply, err error) {
 	startValue := primitive.NilObjectID
 	if request.StartValue != nil {
-		startValue, err = primitive.ObjectIDFromHex(*request.StartValue)
+		startValue, err = primitive.ObjectIDFromHex(request.GetStartValue())
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
-	var nPerPage int64 = 10
+	var nPerPage int64 = 30
 	if request.NPerPage != nil {
 		nPerPage = *request.NPerPage
 	}
@@ -363,12 +362,13 @@ func (s *Server) FindManyCompanies(
 		if err := cursor.Decode(&companyModel); err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+		companyID := companyModel.ID.Hex()
 		companyProto := &CompanyShort{
-			Id:               companyModel.ID.Hex(),
-			Name:             companyModel.Name,
-			Type:             companyModel.Type,
-			Localisation:     companyModel.Localisation,
-			ShortDescription: companyModel.ShortDescription,
+			Id:               &companyID,
+			Name:             &companyModel.Name,
+			Type:             &companyModel.Type,
+			Localisation:     &companyModel.Localisation,
+			ShortDescription: &companyModel.ShortDescription,
 		}
 		reply.Companies = append(reply.Companies, companyProto)
 	}

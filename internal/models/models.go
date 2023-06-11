@@ -13,19 +13,19 @@ import (
 
 type Service struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Name        *string            `bson:"name,omitempty" binding:"max=30"`
-	Price       *int32             `bson:"price,omitempty" binding:"max=1000000"`
-	Duration    *int32             `bson:"duration,omitempty" binding:"max=480"`
-	Description *string            `bson:"description,omitempty" binding:"max=300"`
+	Name        string             `bson:"name,omitempty"`
+	Price       int32              `bson:"price,omitempty"`
+	Duration    int32              `bson:"duration,omitempty"`
+	Description string             `bson:"description,omitempty"`
 }
 
 type Company struct {
 	ID               primitive.ObjectID `bson:"_id,omitempty"`
-	Name             *string            `bson:"name,omitempty" binding:"max=30"`
-	Type             *string            `bson:"type,omitempty" binding:"max=30"`
-	Localisation     *string            `bson:"localisation,omitempty" binding:"max=60"`
-	ShortDescription *string            `bson:"short_description,omitempty" binding:"max=150"`
-	LongDescription  *string            `bson:"long_description,omitempty" binding:"max=300"`
+	Name             string             `bson:"name,omitempty"`
+	Type             string             `bson:"type,omitempty"`
+	Localisation     string             `bson:"localisation,omitempty"`
+	ShortDescription string             `bson:"short_description,omitempty"`
+	LongDescription  string             `bson:"long_description,omitempty"`
 	Services         []Service          `bson:"services,omitempty"`
 }
 
@@ -37,7 +37,17 @@ func (company *Company) InsertOne(
 	return coll.InsertOne(ctx, company)
 }
 
-func (companyUpdate *Company) UpdateOne(
+type CompanyUpdate struct {
+	ID               primitive.ObjectID `bson:"_id,omitempty"`
+	Name             *string            `bson:"name,omitempty"`
+	Type             *string            `bson:"type,omitempty"`
+	Localisation     *string            `bson:"localisation,omitempty"`
+	ShortDescription *string            `bson:"short_description,omitempty"`
+	LongDescription  *string            `bson:"long_description,omitempty"`
+	Services         []Service          `bson:"services,omitempty"`
+}
+
+func (companyUpdate *CompanyUpdate) UpdateOne(
 	ctx context.Context,
 	db *mongo.Database,
 	companyID primitive.ObjectID,
@@ -128,7 +138,15 @@ func getUpdateTerms(updateMap *bson.M) bson.M {
 	return updateTerms
 }
 
-func (serviceUpdate *Service) UpdateOne(
+type ServiceUpdate struct {
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	Name        *string            `bson:"name,omitempty"`
+	Price       *int32             `bson:"price,omitempty"`
+	Duration    *int32             `bson:"duration,omitempty"`
+	Description *string            `bson:"description,omitempty"`
+}
+
+func (serviceUpdate *ServiceUpdate) UpdateOne(
 	ctx context.Context,
 	db *mongo.Database,
 	serviceID primitive.ObjectID,
@@ -140,10 +158,10 @@ func (serviceUpdate *Service) UpdateOne(
 	if err != nil {
 		return nil, err
 	}
-    updateTerms := getUpdateTerms(updateMap)
+	updateTerms := getUpdateTerms(updateMap)
 
-    coll := db.Collection(database.CollName)
-    filter := bson.M{"services._id": serviceID}
+	coll := db.Collection(database.CollName)
+	filter := bson.M{"services._id": serviceID}
 	update := bson.M{"$set": updateTerms}
 	return coll.UpdateOne(ctx, filter, update)
 }
