@@ -27,7 +27,7 @@ type ApiClient interface {
 	UpdateService(ctx context.Context, in *UpdateServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	FindManyServices(ctx context.Context, in *ServicesRequest, opts ...grpc.CallOption) (*ServicesReply, error)
-	AddCompany(ctx context.Context, in *AddCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AddCompany(ctx context.Context, in *AddCompanyRequest, opts ...grpc.CallOption) (*AddCompanyReply, error)
 	UpdateCompany(ctx context.Context, in *UpdateCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCompany(ctx context.Context, in *DeleteCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	FindOneCompany(ctx context.Context, in *CompanyRequest, opts ...grpc.CallOption) (*CompanyReply, error)
@@ -78,8 +78,8 @@ func (c *apiClient) FindManyServices(ctx context.Context, in *ServicesRequest, o
 	return out, nil
 }
 
-func (c *apiClient) AddCompany(ctx context.Context, in *AddCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *apiClient) AddCompany(ctx context.Context, in *AddCompanyRequest, opts ...grpc.CallOption) (*AddCompanyReply, error) {
+	out := new(AddCompanyReply)
 	err := c.cc.Invoke(ctx, "/companiespb.Api/AddCompany", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -131,7 +131,7 @@ type ApiServer interface {
 	UpdateService(context.Context, *UpdateServiceRequest) (*emptypb.Empty, error)
 	DeleteService(context.Context, *DeleteServiceRequest) (*emptypb.Empty, error)
 	FindManyServices(context.Context, *ServicesRequest) (*ServicesReply, error)
-	AddCompany(context.Context, *AddCompanyRequest) (*emptypb.Empty, error)
+	AddCompany(context.Context, *AddCompanyRequest) (*AddCompanyReply, error)
 	UpdateCompany(context.Context, *UpdateCompanyRequest) (*emptypb.Empty, error)
 	DeleteCompany(context.Context, *DeleteCompanyRequest) (*emptypb.Empty, error)
 	FindOneCompany(context.Context, *CompanyRequest) (*CompanyReply, error)
@@ -155,7 +155,7 @@ func (UnimplementedApiServer) DeleteService(context.Context, *DeleteServiceReque
 func (UnimplementedApiServer) FindManyServices(context.Context, *ServicesRequest) (*ServicesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindManyServices not implemented")
 }
-func (UnimplementedApiServer) AddCompany(context.Context, *AddCompanyRequest) (*emptypb.Empty, error) {
+func (UnimplementedApiServer) AddCompany(context.Context, *AddCompanyRequest) (*AddCompanyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCompany not implemented")
 }
 func (UnimplementedApiServer) UpdateCompany(context.Context, *UpdateCompanyRequest) (*emptypb.Empty, error) {

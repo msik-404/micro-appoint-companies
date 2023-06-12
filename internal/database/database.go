@@ -12,6 +12,7 @@ import (
 )
 
 var DBName = os.Getenv("DB_NAME")
+
 const CollName string = "companies"
 
 func getURI() string {
@@ -39,6 +40,9 @@ func CreateDBIndexes(client *mongo.Client) ([]string, error) {
 		{
 			Keys: bson.M{"type": 1},
 		},
+        {
+            Keys: bson.M{"services.service_id": 1},
+        },
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()

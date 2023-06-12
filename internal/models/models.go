@@ -12,7 +12,7 @@ import (
 )
 
 type Service struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	ID          primitive.ObjectID `bson:"service_id,omitempty"`
 	Name        string             `bson:"name,omitempty"`
 	Price       int32              `bson:"price,omitempty"`
 	Duration    int32              `bson:"duration,omitempty"`
@@ -38,13 +38,12 @@ func (company *Company) InsertOne(
 }
 
 type CompanyUpdate struct {
-	ID               primitive.ObjectID `bson:"_id,omitempty"`
-	Name             *string            `bson:"name,omitempty"`
-	Type             *string            `bson:"type,omitempty"`
-	Localisation     *string            `bson:"localisation,omitempty"`
-	ShortDescription *string            `bson:"short_description,omitempty"`
-	LongDescription  *string            `bson:"long_description,omitempty"`
-	Services         []Service          `bson:"services,omitempty"`
+	Name             *string   `bson:"name,omitempty"`
+	Type             *string   `bson:"type,omitempty"`
+	Localisation     *string   `bson:"localisation,omitempty"`
+	ShortDescription *string   `bson:"short_description,omitempty"`
+	LongDescription  *string   `bson:"long_description,omitempty"`
+	Services         []Service `bson:"services,omitempty"`
 }
 
 func (companyUpdate *CompanyUpdate) UpdateOne(
@@ -139,19 +138,18 @@ func getUpdateTerms(updateMap *bson.M) bson.M {
 }
 
 type ServiceUpdate struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Name        *string            `bson:"name,omitempty"`
-	Price       *int32             `bson:"price,omitempty"`
-	Duration    *int32             `bson:"duration,omitempty"`
-	Description *string            `bson:"description,omitempty"`
+	Name        *string `bson:"name,omitempty"`
+	Price       *int32  `bson:"price,omitempty"`
+	Duration    *int32  `bson:"duration,omitempty"`
+	Description *string `bson:"description,omitempty"`
 }
 
 func (serviceUpdate *ServiceUpdate) UpdateOne(
 	ctx context.Context,
 	db *mongo.Database,
+	companyID primitive.ObjectID,
 	serviceID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
-	serviceUpdate.ID = serviceID
 	// this function will erease nil fields,
 	// so that unwanted fields will not be set to empty
 	updateMap, err := toBsonRemoveEmpty(*serviceUpdate)
@@ -161,7 +159,10 @@ func (serviceUpdate *ServiceUpdate) UpdateOne(
 	updateTerms := getUpdateTerms(updateMap)
 
 	coll := db.Collection(database.CollName)
-	filter := bson.M{"services._id": serviceID}
+	filter := bson.D{
+        {Key: "_id", Value: companyID},
+        {Key: "services.service_id", Value: serviceID},
+	}
 	update := bson.M{"$set": updateTerms}
 	return coll.UpdateOne(ctx, filter, update)
 }
@@ -169,11 +170,17 @@ func (serviceUpdate *ServiceUpdate) UpdateOne(
 func DeleteOneService(
 	ctx context.Context,
 	db *mongo.Database,
+	companyID primitive.ObjectID,
 	serviceID primitive.ObjectID,
 ) (*mongo.UpdateResult, error) {
 	coll := db.Collection(database.CollName)
-	filter := bson.M{"services._id": serviceID}
-	update := bson.M{"$pull": bson.M{"services": bson.M{"_id": serviceID}}}
+	filter := bson.M{"$and": bson.A{
+        bson.M{"_id": companyID},
+        bson.M{"services.service_id": serviceID},
+	}}
+    update := bson.M{
+        "$pull": bson.M{"services": bson.M{"service_id": serviceID}},
+    }
 	return coll.UpdateOne(ctx, filter, update)
 }
 
@@ -188,7 +195,7 @@ func FindManyServices(
 	projectionStage := bson.D{{Key: "$project", Value: bson.M{"_id": 0, "services": 1}}}
 	unwindStage := bson.D{{Key: "$unwind", Value: "$services"}}
 	rootStage := bson.D{{Key: "$replaceRoot", Value: bson.M{"newRoot": "$services"}}}
-	sortStage := bson.D{{Key: "$sort", Value: bson.M{"_id": -1}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"service_id": -1}}}
 	limitStage := bson.D{{Key: "$limit", Value: nPerPage}}
 
 	pipeline := mongo.Pipeline{
@@ -201,7 +208,7 @@ func FindManyServices(
 	}
 	if !startValue.IsZero() {
 		startValueStage := bson.D{
-			{Key: "$match", Value: bson.M{"_id": bson.M{"$lt": startValue}}},
+			{Key: "$match", Value: bson.M{"service_id": bson.M{"$lt": startValue}}},
 		}
 		pipeline = mongo.Pipeline{
 			matchStage,

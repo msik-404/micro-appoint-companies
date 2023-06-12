@@ -72,6 +72,10 @@ func (s *Server) UpdateService(
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
+	companyID, err := primitive.ObjectIDFromHex(request.GetCompanyId())
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 	err = verifyString(request.Name, 30)
 	if err != nil {
 		return nil, err
@@ -95,14 +99,14 @@ func (s *Server) UpdateService(
 		Description: request.Description,
 	}
 	db := s.Client.Database(database.DBName)
-	result, err := serviceUpdate.UpdateOne(ctx, db, serviceID)
+	result, err := serviceUpdate.UpdateOne(ctx, db, companyID, serviceID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	if result.MatchedCount == 0 {
 		return nil, status.Error(
 			codes.NotFound,
-			"Service with that id was not found",
+			"Service with that companyID and serviceID was not found",
 		)
 	}
 	return &emptypb.Empty{}, nil
@@ -116,15 +120,19 @@ func (s *Server) DeleteService(
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
+	companyID, err := primitive.ObjectIDFromHex(request.GetCompanyId())
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 	db := s.Client.Database(database.DBName)
-	result, err := models.DeleteOneService(ctx, db, serviceID)
+	result, err := models.DeleteOneService(ctx, db, companyID, serviceID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	if result.MatchedCount == 0 {
 		return nil, status.Error(
 			codes.NotFound,
-			"Service with that id was not found",
+			"Service with that companyID and serviceID was not found",
 		)
 	}
 	return &emptypb.Empty{}, nil
@@ -184,7 +192,7 @@ func (s *Server) FindManyServices(
 func (s *Server) AddCompany(
 	ctx context.Context,
 	request *AddCompanyRequest,
-) (*emptypb.Empty, error) {
+) (*AddCompanyReply, error) {
 	if request.Name == nil {
 		return nil, status.Error(
 			codes.InvalidArgument,
@@ -219,11 +227,14 @@ func (s *Server) AddCompany(
 		LongDescription:  request.GetLongDescription(),
 	}
 	db := s.Client.Database(database.DBName)
-	_, err = newCompany.InsertOne(ctx, db)
+	result, err := newCompany.InsertOne(ctx, db)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &emptypb.Empty{}, nil
+	insertedID := result.InsertedID.(primitive.ObjectID).Hex()
+	return &AddCompanyReply{
+		Id: &insertedID,
+	}, nil
 }
 
 func (s *Server) UpdateCompany(
