@@ -229,6 +229,9 @@ func (s *Server) AddCompany(
 	db := s.Client.Database(database.DBName)
 	result, err := newCompany.InsertOne(ctx, db)
 	if err != nil {
+        if mongo.IsDuplicateKeyError(err) {
+		    return nil, status.Error(codes.AlreadyExists, err.Error())
+        }
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	insertedID := result.InsertedID.(primitive.ObjectID).Hex()
@@ -275,6 +278,9 @@ func (s *Server) UpdateCompany(
 	db := s.Client.Database(database.DBName)
 	result, err := companyUpdate.UpdateOne(ctx, db, companyID)
 	if err != nil {
+        if mongo.IsDuplicateKeyError(err) {
+		    return nil, status.Error(codes.AlreadyExists, err.Error())
+        }
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	if result.MatchedCount == 0 {
