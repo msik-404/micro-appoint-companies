@@ -16,6 +16,7 @@ service Api {
     rpc DeleteCompany (DeleteCompanyRequest) returns (google.protobuf.Empty) {}
     rpc FindOneCompany (CompanyRequest) returns (CompanyReply) {}
     rpc FindManyCompanies (CompaniesRequest) returns (CompaniesReply) {}
+    rpc FindManyCompaniesByIds (CompaniesByIdsRequest) returns (CompaniesReply) {}
 }
 
 message Service {
@@ -110,4 +111,10 @@ message CompanyShort {
 
 message CompaniesReply {
     repeated CompanyShort companies = 1;
+}
+
+message CompaniesByIdsRequest {
+    repeated string ids = 1;
+    optional string start_value = 2;
+    optional int64 n_per_page = 3;
 }

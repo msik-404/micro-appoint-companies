@@ -229,9 +229,9 @@ func (s *Server) AddCompany(
 	db := s.Client.Database(database.DBName)
 	result, err := newCompany.InsertOne(ctx, db)
 	if err != nil {
-        if mongo.IsDuplicateKeyError(err) {
-		    return nil, status.Error(codes.AlreadyExists, err.Error())
-        }
+		if mongo.IsDuplicateKeyError(err) {
+			return nil, status.Error(codes.AlreadyExists, err.Error())
+		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	insertedID := result.InsertedID.(primitive.ObjectID).Hex()
@@ -278,9 +278,9 @@ func (s *Server) UpdateCompany(
 	db := s.Client.Database(database.DBName)
 	result, err := companyUpdate.UpdateOne(ctx, db, companyID)
 	if err != nil {
-        if mongo.IsDuplicateKeyError(err) {
-		    return nil, status.Error(codes.AlreadyExists, err.Error())
-        }
+		if mongo.IsDuplicateKeyError(err) {
+			return nil, status.Error(codes.AlreadyExists, err.Error())
+		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	if result.MatchedCount == 0 {
@@ -368,6 +368,68 @@ func (s *Server) FindManyCompanies(
 	}
 	db := s.Client.Database(database.DBName)
 	cursor, err := models.FindManyCompanies(ctx, db, startValue, nPerPage)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	reply = &CompaniesReply{}
+	for cursor.Next(ctx) {
+		var companyModel models.Company
+		if err := cursor.Decode(&companyModel); err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		companyID := companyModel.ID.Hex()
+		companyProto := &CompanyShort{
+			Id:               &companyID,
+			Name:             &companyModel.Name,
+			Type:             &companyModel.Type,
+			Localisation:     &companyModel.Localisation,
+			ShortDescription: &companyModel.ShortDescription,
+		}
+		reply.Companies = append(reply.Companies, companyProto)
+	}
+	if len(reply.Companies) == 0 {
+		return nil, status.Error(
+			codes.NotFound,
+			"There aren't any companies",
+		)
+	}
+	return reply, nil
+}
+
+func (s *Server) FindManyCompaniesByIds(
+	ctx context.Context,
+	request *CompaniesByIdsRequest,
+) (reply *CompaniesReply, err error) {
+	var companiesIDS []primitive.ObjectID
+	for _, hex := range request.GetIds() {
+		companyID, err := primitive.ObjectIDFromHex(hex)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+		companiesIDS = append(companiesIDS, companyID)
+	}
+	if len(companiesIDS) == 0 {
+		return nil, status.Error(
+			codes.InvalidArgument, 
+			"At least one id should be provided in the request",
+		)
+	}
+	startValue := primitive.NilObjectID
+	if request.StartValue != nil {
+		startValue, err = primitive.ObjectIDFromHex(request.GetStartValue())
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	var nPerPage int64 = 30
+	if request.NPerPage != nil {
+		nPerPage = *request.NPerPage
+	}
+
+	db := s.Client.Database(database.DBName)
+	cursor, err := models.FindManyCompaniesByIds(ctx, db, companiesIDS, startValue, nPerPage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

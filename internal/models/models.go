@@ -105,6 +105,32 @@ func FindManyCompanies(
 	return coll.Find(ctx, filter, opts)
 }
 
+func FindManyCompaniesByIds(
+	ctx context.Context,
+	db *mongo.Database,
+    companyIDS []primitive.ObjectID,
+	startValue primitive.ObjectID,
+	nPerPage int64,
+) (*mongo.Cursor, error) {
+	opts := options.Find()
+	opts.SetSort(bson.M{"_id": -1})
+	opts.SetLimit(nPerPage)
+	opts.SetProjection(bson.D{
+		{Key: "long_description", Value: 0},
+		{Key: "services", Value: 0},
+	})
+
+    filter := bson.M{"_id": bson.M{"$in": bson.A{companyIDS}}}
+	if !startValue.IsZero() {
+        filter = bson.M{"$and": bson.A{
+            filter,
+            bson.M{"_id": bson.M{"$lt": startValue}},
+        }}
+	}
+	coll := db.Collection(database.CollName)
+	return coll.Find(ctx, filter, opts)
+}
+
 func (service *Service) InsertOne(
 	ctx context.Context,
 	db *mongo.Database,
@@ -160,8 +186,8 @@ func (serviceUpdate *ServiceUpdate) UpdateOne(
 
 	coll := db.Collection(database.CollName)
 	filter := bson.D{
-        {Key: "_id", Value: companyID},
-        {Key: "services.service_id", Value: serviceID},
+		{Key: "_id", Value: companyID},
+		{Key: "services.service_id", Value: serviceID},
 	}
 	update := bson.M{"$set": updateTerms}
 	return coll.UpdateOne(ctx, filter, update)
@@ -175,12 +201,12 @@ func DeleteOneService(
 ) (*mongo.UpdateResult, error) {
 	coll := db.Collection(database.CollName)
 	filter := bson.M{"$and": bson.A{
-        bson.M{"_id": companyID},
-        bson.M{"services.service_id": serviceID},
+		bson.M{"_id": companyID},
+		bson.M{"services.service_id": serviceID},
 	}}
-    update := bson.M{
-        "$pull": bson.M{"services": bson.M{"service_id": serviceID}},
-    }
+	update := bson.M{
+		"$pull": bson.M{"services": bson.M{"service_id": serviceID}},
+	}
 	return coll.UpdateOne(ctx, filter, update)
 }
 

@@ -32,6 +32,7 @@ type ApiClient interface {
 	DeleteCompany(ctx context.Context, in *DeleteCompanyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	FindOneCompany(ctx context.Context, in *CompanyRequest, opts ...grpc.CallOption) (*CompanyReply, error)
 	FindManyCompanies(ctx context.Context, in *CompaniesRequest, opts ...grpc.CallOption) (*CompaniesReply, error)
+	FindManyCompaniesByIds(ctx context.Context, in *CompaniesByIdsRequest, opts ...grpc.CallOption) (*CompaniesReply, error)
 }
 
 type apiClient struct {
@@ -123,6 +124,15 @@ func (c *apiClient) FindManyCompanies(ctx context.Context, in *CompaniesRequest,
 	return out, nil
 }
 
+func (c *apiClient) FindManyCompaniesByIds(ctx context.Context, in *CompaniesByIdsRequest, opts ...grpc.CallOption) (*CompaniesReply, error) {
+	out := new(CompaniesReply)
+	err := c.cc.Invoke(ctx, "/companiespb.Api/FindManyCompaniesByIds", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApiServer is the server API for Api service.
 // All implementations must embed UnimplementedApiServer
 // for forward compatibility
@@ -136,6 +146,7 @@ type ApiServer interface {
 	DeleteCompany(context.Context, *DeleteCompanyRequest) (*emptypb.Empty, error)
 	FindOneCompany(context.Context, *CompanyRequest) (*CompanyReply, error)
 	FindManyCompanies(context.Context, *CompaniesRequest) (*CompaniesReply, error)
+	FindManyCompaniesByIds(context.Context, *CompaniesByIdsRequest) (*CompaniesReply, error)
 	mustEmbedUnimplementedApiServer()
 }
 
@@ -169,6 +180,9 @@ func (UnimplementedApiServer) FindOneCompany(context.Context, *CompanyRequest) (
 }
 func (UnimplementedApiServer) FindManyCompanies(context.Context, *CompaniesRequest) (*CompaniesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindManyCompanies not implemented")
+}
+func (UnimplementedApiServer) FindManyCompaniesByIds(context.Context, *CompaniesByIdsRequest) (*CompaniesReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindManyCompaniesByIds not implemented")
 }
 func (UnimplementedApiServer) mustEmbedUnimplementedApiServer() {}
 
@@ -345,6 +359,24 @@ func _Api_FindManyCompanies_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Api_FindManyCompaniesByIds_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompaniesByIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiServer).FindManyCompaniesByIds(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/companiespb.Api/FindManyCompaniesByIds",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiServer).FindManyCompaniesByIds(ctx, req.(*CompaniesByIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Api_ServiceDesc is the grpc.ServiceDesc for Api service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -387,6 +419,10 @@ var Api_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FindManyCompanies",
 			Handler:    _Api_FindManyCompanies_Handler,
+		},
+		{
+			MethodName: "FindManyCompaniesByIds",
+			Handler:    _Api_FindManyCompaniesByIds_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
