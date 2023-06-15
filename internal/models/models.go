@@ -120,7 +120,7 @@ func FindManyCompaniesByIds(
 		{Key: "services", Value: 0},
 	})
 
-    filter := bson.M{"_id": bson.M{"$in": bson.A{companyIDS}}}
+    filter := bson.M{"_id": bson.M{"$in": companyIDS}}
 	if !startValue.IsZero() {
         filter = bson.M{"$and": bson.A{
             filter,
