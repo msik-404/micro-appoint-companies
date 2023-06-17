@@ -164,6 +164,7 @@ func (s *Server) FindManyServices(
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
+    defer cursor.Close(ctx)
 	reply := &ServicesReply{}
 	for cursor.Next(ctx) {
 		var serviceModel models.Service
@@ -373,6 +374,7 @@ func (s *Server) FindManyCompanies(
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
+    defer cursor.Close(ctx)
 	reply = &CompaniesReply{}
 	for cursor.Next(ctx) {
 		var companyModel models.Company
@@ -433,8 +435,9 @@ func (s *Server) FindManyCompaniesByIds(
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
+    ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+    defer cancel()
+    defer cursor.Close(ctx)
 	reply = &CompaniesReply{}
 	for cursor.Next(ctx) {
 		var companyModel models.Company
