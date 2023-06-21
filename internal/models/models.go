@@ -230,22 +230,14 @@ func FindManyServices(
 		unwindStage,
 		rootStage,
 		sortStage,
-		limitStage,
 	}
 	if !startValue.IsZero() {
 		startValueStage := bson.D{
 			{Key: "$match", Value: bson.M{"service_id": bson.M{"$lt": startValue}}},
 		}
-		pipeline = mongo.Pipeline{
-			matchStage,
-			projectionStage,
-			unwindStage,
-			rootStage,
-			sortStage,
-			startValueStage,
-			limitStage,
-		}
+        pipeline = append(pipeline, startValueStage)
 	}
+    pipeline = append(pipeline, limitStage)
 	coll := db.Collection(database.CollName)
 	return coll.Aggregate(ctx, pipeline)
 }

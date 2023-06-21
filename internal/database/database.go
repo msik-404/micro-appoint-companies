@@ -40,9 +40,15 @@ func CreateDBIndexes(client *mongo.Client) ([]string, error) {
 		{
 			Keys: bson.M{"type": 1},
 		},
-        {
-            Keys: bson.M{"services.service_id": 1},
-        },
+		{
+			Keys: bson.M{"services.service_id": 1},
+		},
+		{
+			Keys: bson.D{
+				{Key: "_id", Value: 1},
+				{Key: "services.service_id", Value: 1},
+			},
+		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
