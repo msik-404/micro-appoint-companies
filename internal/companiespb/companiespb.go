@@ -164,7 +164,7 @@ func (s *Server) FindManyServices(
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-    defer cursor.Close(ctx)
+	defer cursor.Close(ctx)
 	reply := &ServicesReply{}
 	for cursor.Next(ctx) {
 		var serviceModel models.Service
@@ -333,10 +333,11 @@ func (s *Server) FindOneCompany(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	companyProto := &CompanyReply{
-		Name:            &companyModel.Name,
-		Type:            &companyModel.Type,
-		Localisation:    &companyModel.Localisation,
-		LongDescription: &companyModel.LongDescription,
+		Name:             &companyModel.Name,
+		Type:             &companyModel.Type,
+		Localisation:     &companyModel.Localisation,
+		ShortDescription: &companyModel.ShortDescription,
+		LongDescription:  &companyModel.LongDescription,
 	}
 	for idx := range companyModel.Services {
 		serviceID := companyModel.Services[idx].ID.Hex()
@@ -374,7 +375,7 @@ func (s *Server) FindManyCompanies(
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-    defer cursor.Close(ctx)
+	defer cursor.Close(ctx)
 	reply = &CompaniesReply{}
 	for cursor.Next(ctx) {
 		var companyModel models.Company
@@ -414,7 +415,7 @@ func (s *Server) FindManyCompaniesByIds(
 	}
 	if len(companiesIDS) == 0 {
 		return nil, status.Error(
-			codes.InvalidArgument, 
+			codes.InvalidArgument,
 			"At least one id should be provided in the request",
 		)
 	}
@@ -435,9 +436,9 @@ func (s *Server) FindManyCompaniesByIds(
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-    ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-    defer cancel()
-    defer cursor.Close(ctx)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	defer cursor.Close(ctx)
 	reply = &CompaniesReply{}
 	for cursor.Next(ctx) {
 		var companyModel models.Company
