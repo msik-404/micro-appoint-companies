@@ -74,7 +74,6 @@ func FindOneCompany(
 	opts := options.FindOne()
 	opts.SetProjection(bson.D{
 		{Key: "_id", Value: 0},
-		{Key: "short_description", Value: 0},
 		{Key: "services", Value: bson.M{"$slice": 10}},
 	})
 
