@@ -2,7 +2,6 @@ package companiespb
 
 import (
 	"context"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -162,8 +161,6 @@ func (s *Server) FindManyServices(
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
 	defer cursor.Close(ctx)
 	reply := &ServicesReply{}
 	for cursor.Next(ctx) {
@@ -373,8 +370,6 @@ func (s *Server) FindManyCompanies(
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
 	defer cursor.Close(ctx)
 	reply = &CompaniesReply{}
 	for cursor.Next(ctx) {
@@ -436,8 +431,6 @@ func (s *Server) FindManyCompaniesByIds(
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
 	defer cursor.Close(ctx)
 	reply = &CompaniesReply{}
 	for cursor.Next(ctx) {
