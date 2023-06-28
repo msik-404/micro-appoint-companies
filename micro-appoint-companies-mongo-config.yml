@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: micro-appoint-companies-mongo-config
+data:
+  db-name: "micro-appoint-companies"
+  db-hostname: micro-appoint-companies-mongo-service
